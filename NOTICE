@@ -1,0 +1,46 @@
+LMAP — Liquid Media Access Protocol
+====================================
+
+This repository contains the specification and reference materials
+for the Liquid Media Access Protocol (LMAP), an open standard for
+tokenized media ownership and peer-distributed delivery.
+
+Copyright 2025-2026 Harrison Kavanaugh and the Liquid Media
+Foundation contributors.
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+ATTRIBUTION
+===========
+
+Per Section 4(d) of the Apache License, derivative works should
+include attribution to the original protocol. Suggested attribution:
+
+  "Implements the Liquid Media Access Protocol (LMAP), an open
+   standard stewarded by the Liquid Media Foundation."
+
+  See: https://github.com/LiquidMediaFoundation/lmap
+
+The Apache License's standard attribution requirements apply. No
+additional commercial-attribution requirements are imposed by this
+NOTICE file.
+
+TRADEMARKS
+==========
+
+"Liquid Media Foundation" and "LMAP" are intended to be used
+descriptively to refer to the foundation and the protocol it
+stewards. No grant of trademark rights is conferred by this NOTICE
+or the Apache License.
+
+"Wylloh" is a trademark of Harrison Kavanaugh, used to identify the
+first commercial implementation of LMAP. The Wylloh trademark is
+not licensed under this NOTICE; commercial implementations of LMAP
+are not required to use the Wylloh name.
+
+CONTACT
+=======
+
+- Foundation: Liquid Media Foundation (in formation)
+- GitHub: https://github.com/LiquidMediaFoundation/lmap
+- Reference implementation: https://wylloh.com
