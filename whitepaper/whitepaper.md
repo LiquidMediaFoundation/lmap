@@ -1,8 +1,8 @@
 <div class="titleblock">
 
-# LMAP {.title}
+# LMAP — Liquid Media Access Protocol {.title}
 
-#### A Peer-to-Peer Protocol for Film Distribution and Ownership {.subtitle}
+#### A Peer-to-Peer Protocol for Media Distribution and Ownership {.subtitle}
 
 Harrison Kavanaugh  ·  contact\@liquidmediafoundation.org
 
@@ -65,8 +65,9 @@ participation in secondary markets.
 What is needed is a protocol-level solution addressing all
 constituencies simultaneously — analogous to how DVD or USB function:
 not as a platform a consumer signs up for, but as a *standard* that
-many implementations interoperate through. We propose LMAP: a
-protocol where films are tokenized into standardized units granting
+many implementations interoperate through. We propose LMAP (the
+Liquid Media Access Protocol): a protocol where digital media is
+tokenized into standardized units granting
 verifiable ownership and access rights; content is distributed
 through a peer-to-peer network that scales positively with demand;
 smart contracts ensure automatic royalty distribution on every
