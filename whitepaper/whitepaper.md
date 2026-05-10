@@ -6,7 +6,7 @@
 
 Harrison Kavanaugh  ·  contact\@liquidmediafoundation.org
 
-*Version 2.1 — May 2026*
+*Version 2.2 — May 2026*
 
 </div>
 
@@ -479,31 +479,124 @@ wylloh.com serves as the first reference application.
 ## 10. Marketplace Mechanics {-}
 
 The protocol includes integrated marketplace functionality. Primary
-sales occur through minting at prices set by the copyright holder.
+sales occur through minting at prices set by the title's author.
 Secondary sales enable peer-to-peer trading with automatic royalty
 distribution on each transaction.
 
-Unlike physical media, where secondary sales generated no creator
-compensation, every token transfer routed through the protocol's
-marketplace contract triggers royalty distribution. A 2.5% protocol
-fee flows to the Liquid Media Foundation treasury for shared infrastructure
-(IPFS pinning redundancy, contract auditing, security work,
-open-source maintenance). The remaining 97.5% flows to addresses
-encoded in the token's metadata — typically the copyright holder
-and original creators. This creates ongoing revenue streams persisting
-throughout the content's commercial life, including markets that
-never existed for physical media.
+### 10.1 Three-Way Revenue Split {-}
 
-The protocol fee is hardcoded at the contract level and immutable.
-It is not a *platform* fee — meaning it is not the rent extracted by
-a particular marketplace for matching buyers with sellers. It is a
-*protocol* fee, supporting the shared infrastructure all marketplaces
-depend on, and is identical across every LMAP-compatible
+Every primary sale routed through the protocol distributes payment
+across three parties, with proportions set per title at mint time:
+
+- **Protocol fee: 2.5%** (immutable, hardcoded at the contract level).
+  Flows to the Liquid Media Foundation treasury for shared
+  infrastructure: IPFS pinning redundancy, contract auditing,
+  security work, open-source maintenance.
+
+- **Publisher fee: 0–25%** (set per title, immutable for that title).
+  Flows to the publisher — the wallet that minted the title.
+  Publishers are entities that bring works to market: established
+  storefronts, indie collectives, or self-publishing authors. Their
+  cut compensates curation, marketing, audience development, and
+  brand value.
+
+- **Author share: remainder.** Flows to the author — the credited
+  creator(s). Distributed via an optional royalty shareholders
+  configuration (§10.3) supporting up to 50 collaborators per title.
+
+For a typical configuration — 10% publisher fee — the split is
+2.5% / 10% / 87.5%. Authors receive dramatically better economics
+than traditional publishers (where author shares of 10–20% are
+common). The protocol's 25% publisher cap is the only opinionated
+stance: *publishing on LMAP shall not become as extractive as the
+systems it replaces*.
+
+### 10.2 Publisher and Author as Distinct Roles {-}
+
+The protocol records two distinct identities per title:
+
+- **Publisher** is set automatically from the wallet that calls the
+  mint function. Cryptographically authentic — cannot be impersonated.
+  Establishes the brand identity associated with the title and
+  receives the publisher fee on primary sales.
+
+- **Author** is provided at mint and identifies the credited creator
+  of the work. Receives the author share of every primary and
+  secondary sale.
+
+The two roles are often the same wallet (an author who self-publishes)
+but can differ (a publisher mints under their brand and routes the
+author share to a separate creator wallet). This mirrors the
+publishing-house / author distinction familiar from books, films,
+and music.
+
+### 10.3 Royalty Shareholders {-}
+
+Authors can configure up to 50 royalty shareholders per title, each
+receiving a configurable percentage of the author's share. This
+supports the realistic case where a tokenized work has multiple
+contributors deserving compensation: a film with director, lead
+actors, composer, screenwriter; a video game with developers,
+artists, and key team members; an album with songwriter, performers,
+and producer.
+
+Shareholders are mutable by the author, allowing collaborators to be
+added or adjusted as the work evolves. Sum of shares can be ≤ 100%
+of the author's share; any remainder flows to the author wallet,
+preserving the author as the residual recipient. For projects with
+more than 50 beneficiaries, shareholders compose with external
+splitter contracts (e.g., 0xSplits): one shareholder slot can route
+to a splitter address that distributes further.
+
+Distribution happens automatically on every protocol-routed sale —
+both primary and secondary. No manual royalty disbursement, no
+escrow, no off-chain ledger reconciliation.
+
+### 10.4 Royalty Enforcement Boundary {-}
+
+The protocol enforces royalties cryptographically for sales routed
+through its marketplace functions. External marketplaces honoring
+the ERC-2981 royalty standard will respect the configured royalty
+when displaying and processing sales. Direct wallet-to-wallet
+transfers (the gift, inheritance, and personal-give use cases) do
+not trigger royalties — this is a property of the underlying
+ERC-1155 standard and a deliberate preservation of token-as-property
+semantics.
+
+Off-chain payment with on-chain gift is theoretically possible and
+unenforceable cryptographically, as with every royalty-bearing
+token system. The protocol's mitigation is structural: the low
+2.5% protocol fee minimizes the savings from circumvention; the
+integrated marketplace makes legitimate sales easier than
+coordination; on-chain transparency makes wash-trade patterns
+visible and reputationally costly.
+
+### 10.5 Bulk Acquisition for Rights Stacking {-}
+
+The marketplace supports atomic batch purchases (`batchBuyListings`),
+enabling a single transaction to acquire tokens from many sellers
+simultaneously. This is essential for the rights-stacking use case
+(§11): a buyer assembling tokens to meet a theatrical-exhibition
+threshold may need to acquire thousands of tokens from hundreds of
+sellers in a single coordinated purchase. The atomic semantics
+guarantee all-or-nothing: if any listing in the batch fails, the
+entire transaction reverts, preventing the partial-fill case where
+a buyer pays fees but doesn't reach their target threshold.
+
+Platform UIs aggregate, sort, and present available listings; the
+protocol provides the batch-execution primitive.
+
+### 10.6 The Protocol Fee Is Not a Platform Fee {-}
+
+The 2.5% protocol fee supports shared infrastructure all
+implementations depend on, identical across every LMAP-compatible
 marketplace. Third-party marketplaces may layer their own commercial
 markup on top, competing on user experience, curation, and discovery
 rather than by undercutting the protocol fee. This places third-party
 marketplaces and the reference web client at wylloh.com in a peer
 relationship with one another, not a competitive one.
+
+### 10.7 Settlement and Gas Abstraction {-}
 
 Transactions settle in stablecoin to insulate buyers from
 cryptocurrency volatility. The current implementation uses USDC.e
@@ -514,17 +607,20 @@ near-term limitation rather than an intended feature. The
 architectural answer is account abstraction via ERC-4337 [^6]
 *paymaster contracts*: a paymaster pays MATIC gas on the user's
 behalf, recovering the cost via a small USDC surcharge bundled into
-the transaction. Paymasters are deployed and funded at the
-marketplace layer, not the protocol layer; each marketplace can
-choose whether and how to subsidize gas as part of its commercial
-offering. The protocol does not mandate or fund a particular
-paymaster, leaving the gas-abstraction question to marketplaces as
-one of their commercial choices.
+the transaction. The reference contract V5 exposes paymaster hooks
+allowing a paymaster contract to be wired in by foundation
+governance. Paymasters are deployed and funded at the marketplace
+layer; each marketplace can choose whether and how to subsidize gas
+as part of its commercial offering.
 
-*Implementation status:* primary sales, secondary sales with royalty
-enforcement, and the protocol fee are shipped. Account-abstracted
-paymaster gas subsidy is specified at the protocol layer and is a
-roadmap item for marketplace implementations.
+*Implementation status:* primary sales with three-way distribution,
+secondary sales with royalty enforcement, royalty shareholder
+distribution, batch acquisition, and the protocol fee are
+specified in the V5 reference contract. The V5 contract is in
+active development; deployment under foundation governance is a
+2026 milestone. The legacy V4.1 registry remains in operation for
+existing tokens (open-tier only, two-way author/protocol split)
+during the transition.
 
 ## 11. Commercial Rights Discovery {-}
 
@@ -690,20 +786,50 @@ includes the foundation's formal establishment, the attestation
 framework's first audit milestones, and the public sunset of any
 admin keys held by the founding team.
 
-A related present-tense reality: minting of new films is currently
-gated behind a `FILM_CREATOR_ROLE` granted by an `ADMIN_ROLE` holder
-(the founding team) on a curated basis. This is the small editorial
-gate that prevents the protocol from becoming an undifferentiated
-marketplace before a decentralized curation mechanism is designed.
-Future protocol versions are specified to replace role-based minting
-with a permissionless mechanism (staking-backed, reputation-weighted,
-or a federated curation framework). The sunset of role-based minting
-is part of the foundation's governance roadmap.
+**Curation: gateless, not absent.** The protocol layer is
+permissionless — any wallet can mint a title (V5 onward). Curation
+happens at the application and registry layers, not at the protocol.
+Three signals work together:
 
-*Implementation status:* the foundation is unincorporated; the
-stewardship arrangement is operational; role-gated minting is the
-current curation mechanism; decentralization milestones are
-specified at the strategic level.
+1. **Cryptographic identity at mint.** The wallet that mints a
+   title is recorded as the publisher, on-chain, immutably. Brand
+   identity is wallet-bound and cannot be impersonated.
+
+2. **Foundation-maintained verified publishers registry.** The
+   Liquid Media Foundation publishes a curated list of verified
+   publishers at `lmap.org/publishers.json`. Verification signals
+   quality and accountability without restricting the protocol;
+   unverified publishers can still mint, but won't appear in
+   verified-only application views.
+
+3. **Application-layer editorial choice.** Each platform built on
+   LMAP applies its own filter: the Wylloh storefront shows titles
+   from Wylloh and other respected publishers; an indie aggregator
+   might show all unverified content; a music-focused platform
+   filters by `mediaType: music` and music-publisher wallets. The
+   protocol exposes the truth (who minted what); applications
+   shape the experience.
+
+This model — *permissionless protocol, curated applications* —
+mirrors how DNS works: anyone can register a domain, but
+resolvers, browsers, and search engines each apply their own
+filters. Quality emerges economically rather than by gatekeeping.
+A publisher with poor taste mints work nobody buys; a publisher
+with good taste accumulates verified status and earns the
+publisher fee from real demand.
+
+The legacy V4.1 registry retains its `FILM_CREATOR_ROLE` gate as
+the editorial mechanism for the open-tier-only deployment serving
+already-minted titles. New tokenizations under V5 land in the
+permissionless model.
+
+*Implementation status:* the foundation is in formation
+(incorporation as a 501(c)(6) trade association is a funded
+milestone of the upcoming raise); V5's permissionless minting is
+specified and implemented in the reference contract scaffold;
+deployment under foundation governance is a 2026 milestone; the
+verified publishers registry will launch concurrently with V5
+deployment.
 
 ## 16. Comparison with Prior Work {-}
 
@@ -804,22 +930,32 @@ antidote.*
 A precise summary of the protocol's components by their status as
 of this paper's publication:
 
-- **Shipped:** ERC-1155 distribution registry on Polygon mainnet
-  (V4.1); modular rights stacking; chunked AES-256-GCM encryption;
+- **Shipped (legacy V4.1 deployment):** ERC-1155 distribution
+  registry on Polygon mainnet at
+  `0x8e834c6031A2d59e1cADd24Ab24F668301ed7c1D`; role-gated minting;
+  modular rights stacking; chunked AES-256-GCM encryption;
   open-tier deterministic key derivation; encrypted-master-key
   delivery via storage service; web client at wylloh.com; first
   tokenized film (*The Cocoanuts*, 1929) sold and downloaded
-  end-to-end.
-- **Specified, in implementation:** reference Seed device (the
-  *Origin*); native client applications for Roku, Apple TV, and iOS;
-  ERC-4337 paymaster contracts for gas abstraction at the marketplace
-  layer.
-- **Specified, future protocol versions:** ERC-721 copyright
+  end-to-end. The V4.1 contract continues to serve existing tokens.
+- **Specified, in active implementation (V5):** the LMAPRegistryV5
+  reference contract under foundation governance — adds the
+  three-way revenue split (§10.1), publisher/author distinction
+  (§10.2), royalty shareholder distribution (§10.3), atomic batch
+  acquisition for rights stacking (§10.5), `mediaType` field for
+  media-agnostic operation, updateable platform treasury via
+  multi-sig timelock, ERC-4337 paymaster hooks, and permissionless
+  minting (§15). Scaffold with passing tests; full marketplace
+  implementation, comprehensive test coverage, and deployment under
+  foundation governance are 2026 milestones.
+- **Specified, in implementation (hardware and clients):** reference
+  Seed device (the *Origin*); native client applications for Roku,
+  Apple TV, and iOS.
+- **Specified, future protocol versions (V6+):** ERC-721 copyright
   registry; on-chain staking for commercial-exhibition windows;
   presale-funding milestone-escrow contracts; threshold dispersal
   of ciphertext shards; certified-tier attestation framework with
-  federated issuers; permissionless minting mechanisms replacing
-  role-based gating.
+  federated issuers and hardware-attested per-device key wrapping.
 - **Long-horizon (operational maturity required):** studio-grade
   certified-tier engagement with major rights holders; native
   protocol token mechanics for proof-of-storage incentives.
@@ -833,6 +969,24 @@ living public artifact.
 \vspace{1em}
 
 ## Changelog {-}
+
+**Version 2.2 (May 2026).** V5 reference contract specification
+additions. §10 (Marketplace Mechanics) substantially expanded to
+specify the V5 economic model: three-way revenue split
+(protocol 2.5% / publisher 0–25% / author remainder), distinct
+publisher/author identities (publisher cryptographically authentic
+via mint-time `msg.sender`), royalty shareholder distribution
+supporting up to 50 collaborators per title, atomic batch
+acquisition for rights stacking, and an honest articulation of
+the royalty enforcement boundary (V5-marketplace sales enforce
+cryptographically; direct ERC-1155 transfers preserve the gift /
+inheritance use case). §15 (Governance) updated to reflect V5's
+permissionless minting model — curation moves from a protocol-level
+role gate to a three-signal application-layer model: cryptographic
+publisher identity, a foundation-maintained verified publishers
+registry at `lmap.org/publishers.json`, and individual platforms'
+editorial choice. Implementation Status restructured to reflect
+V4.1 (legacy, in operation) and V5 (in active implementation).
 
 **Version 2.1 (May 2026).** Rebrand pass under Liquid Media
 Foundation stewardship. The protocol — previously referred to
