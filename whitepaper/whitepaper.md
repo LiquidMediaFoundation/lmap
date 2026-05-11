@@ -6,7 +6,7 @@
 
 Harrison Kavanaugh  ·  contact\@liquidmediafoundation.org
 
-*Version 2.2 — May 2026*
+*Version 2.3 — May 2026*
 
 </div>
 
@@ -311,6 +311,31 @@ contemporary trusted-computing literature. Per-title content keys
 are derived from a master with HKDF-style domain-separated key
 derivation [^11] to prevent key reuse across titles.
 
+**Hardware binding is a normative requirement of the certified tier.**
+A compliant certified-tier implementation MUST use a hardware secure
+element to (a) generate the per-device keypair, (b) hold the private
+key in non-extractable form, (c) perform key unwrapping, and (d) sign
+attestation reports. An implementation that performs any of these
+operations outside a hardware secure element is not conformant with
+LMAP V6 and MUST NOT be marketed as such. This is the protocol-level
+guarantee studios rely on when authorizing content for the certified
+tier. Wire-level specifics of the attestation report format, the
+attestation credential schema, and the issuer federation protocol are
+committed to a separate LMAP V6 technical specification, forthcoming.
+
+A clarifying distinction: only the *decryption* step requires
+certified hardware. Encrypted certified-tier content is freely
+distributable through the same content-addressed substrate as
+open-tier content — any device can hold, pin, or serve it. Tokens
+remain freely transferable across all wallets. The certified tier
+gates *playback*, not *carriage*. This preserves user sovereignty (a
+buyer's ownership is unaffected by hardware availability; they can
+transfer their token at any time) while satisfying the studio
+requirement (decryption is impossible without an attested secure
+element). The architectural model mirrors theatrical distribution
+under DCI: the encrypted DCP is portable and freely distributable;
+only certified projectors with KDM-bound keys can play.
+
 ### 7.3 Attestation Issuers and the Federated Framework {-}
 
 Attestation credentials in the certified tier are signed by
@@ -383,10 +408,13 @@ specifications watermark insertion points but does not mandate a
 particular scheme.
 
 *Implementation status:* open tier (deterministic key derivation,
-chunked AES-256-GCM, encrypted-master-key delivery via storage API)
-is shipped. Certified tier (per-device key wrapping, hardware
-attestation, federated issuers) is specified at the protocol level
-and hardware-ready in the reference Seed; the framework's first
+chunked AES-256-GCM, self-contained manifest reading from on-chain
+metadata + IPFS, with storage-API fallback for tokens whose metadata
+predates the self-contained format) is shipped and demonstrated
+end-to-end on independent hardware. Certified tier (per-device key
+wrapping, hardware attestation, federated issuers) is specified at
+the protocol level with hardware-binding declared normative (§7.2);
+the wire-level attestation specification, the framework's first
 issuer, governance process, and operational maturity are forthcoming.
 
 ## 8. Permanence Guarantees {-}
@@ -472,9 +500,20 @@ from this paper as a buildable open-hardware design. The protocol
 does not require the Origin or any particular Seed implementation;
 any compliant device can participate.
 
-*Implementation status:* the Seed network architecture is specified.
-The reference Origin device is in pre-production. The web client at
-wylloh.com serves as the first reference application.
+*Implementation status:* an open-source reference Seed daemon is
+operational. It verifies wallet ownership directly against the
+on-chain registry, fetches encrypted content from IPFS (preferring a
+co-resident Kubo node where present, falling back to public
+gateways), decrypts streaming with constant memory, automatically
+pins the source CID to make the Seed a provider for the content it
+holds, and exposes a long-running HTTP service with mDNS
+auto-discovery and HTTP byte-range streaming for LAN client
+applications. End-to-end operation has been demonstrated on
+independent ARM64 hardware (Raspberry Pi 4), with byte-identical
+decrypted output across architectures and with no dependency on any
+centralized service. The reference *Origin* device is in
+pre-production. The web client at wylloh.com serves as the first
+reference application.
 
 ## 10. Marketplace Mechanics {-}
 
@@ -934,10 +973,14 @@ of this paper's publication:
   registry on Polygon mainnet at
   `0x8e834c6031A2d59e1cADd24Ab24F668301ed7c1D`; role-gated minting;
   modular rights stacking; chunked AES-256-GCM encryption;
-  open-tier deterministic key derivation; encrypted-master-key
-  delivery via storage service; web client at wylloh.com; first
-  tokenized film (*The Cocoanuts*, 1929) sold and downloaded
-  end-to-end. The V4.1 contract continues to serve existing tokens.
+  open-tier deterministic key derivation; self-contained manifest
+  reading from on-chain metadata + IPFS, with storage-service
+  fallback; open-source reference Seed daemon (verify ownership,
+  fetch + decrypt, auto-pin, LAN-stream over HTTP/mDNS); web client
+  at wylloh.com; first tokenized film (*The Cocoanuts*, 1929) sold
+  and downloaded end-to-end across two independent architectures
+  (macOS arm64, Raspberry Pi aarch64) with byte-identical output.
+  The V4.1 contract continues to serve existing tokens.
 - **Specified, in active implementation (V5):** the LMAPRegistryV5
   reference contract under foundation governance — adds the
   three-way revenue split (§10.1), publisher/author distinction
@@ -955,7 +998,11 @@ of this paper's publication:
   registry; on-chain staking for commercial-exhibition windows;
   presale-funding milestone-escrow contracts; threshold dispersal
   of ciphertext shards; certified-tier attestation framework with
-  federated issuers and hardware-attested per-device key wrapping.
+  federated issuers and **normatively-required hardware-attested
+  per-device key wrapping** (§7.2). The wire-level attestation
+  specification (report format, credential schema, issuer federation
+  protocol, revocation flow) is committed to a separate LMAP V6
+  technical specification, forthcoming.
 - **Long-horizon (operational maturity required):** studio-grade
   certified-tier engagement with major rights holders; native
   protocol token mechanics for proof-of-storage incentives.
@@ -969,6 +1016,29 @@ living public artifact.
 \vspace{1em}
 
 ## Changelog {-}
+
+**Version 2.3 (May 2026).** Reference Seed daemon promoted from
+"specified" to "shipped" in the Implementation Status. §9
+(Seed Network) updated to reflect end-to-end operation of the
+open-source reference daemon on independent ARM64 hardware (Raspberry
+Pi 4) with byte-identical decrypted output across architectures and
+no dependency on any centralized service. The daemon's operating
+behavior — IPFS fetch with local Kubo preference, automatic
+content pinning to make the Seed a provider, LAN-streaming via
+HTTP/mDNS with byte-range support — is documented as the
+canonical reference behavior for compliant Seeds. §7.2 (Certified
+Tier) gains a normative statement: hardware binding (SE-resident
+keypair generation, non-extractable private keys, in-SE key
+unwrapping, in-SE attestation signing) is a MUST for V6
+conformance, and an implementation omitting any of these operations
+is not LMAP-V6-conformant and MUST NOT be marketed as such. A
+clarifying paragraph distinguishes *playback* (which requires
+certified hardware) from *carriage* (which does not — tokens,
+encrypted content, and pinning remain freely accessible across all
+hardware), mirroring DCI theatrical distribution. Wire-level
+attestation specifics (report format, credential schema, issuer
+federation protocol, revocation flow) are deferred to a separate
+LMAP V6 technical specification, forthcoming.
 
 **Version 2.2 (May 2026).** V5 reference contract specification
 additions. §10 (Marketplace Mechanics) substantially expanded to
