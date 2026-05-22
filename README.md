@@ -29,8 +29,8 @@ reference deployment until V5 ships.
 | Reference contract `LMAPRegistryV5` | In development |
 | Paired copyright registry `LMAPCopyrightRegistryV1` | Specified |
 | Legacy `WyllohRegistryProtocolV4_1` (open-tier compatible) | Shipped, immutable, on Polygon mainnet |
-| Minimal Node.js reference client | Planned |
-| Whitepaper v3.0 | In drafting |
+| Node.js reference client (Seed daemon) | Operational in the Wylloh reference implementation; extraction to this repo planned |
+| Whitepaper | v2.3 published (May 2026) — see [`whitepaper/`](./whitepaper/) |
 
 ---
 
