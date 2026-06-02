@@ -51,21 +51,21 @@ report those to the implementing party directly.
 
 The LMAP threat model is documented in `docs/PROTOCOL_LAYERS.md`,
 particularly §4 (Cryptography) and §7 (Attestation), and in the
-whitepaper §8. The protocol's security model is threshold-mediated
-key release with stake-based sybil resistance — access to
-decryption material is gated by current on-chain ownership at
-decryption time, evaluated by a distributed threshold network.
-Hardware-attested key wrapping is supported as forward-compatibility
-for licensing relationships predicated on legacy industry frameworks
-(see whitepaper §8.4); it is not the load-bearing security layer.
-
-The legacy deterministic key-derivation construction used in the
-V4.1 deployment (in which the wrapping key is derivable from public
-on-chain data) is retired as a production model and remains in
-operation only for the existing public-domain V4.1 tokens. Reports
+whitepaper v2.4 §7. The protocol's open-tier production access
+control is **threshold-mediated key release via Lit Protocol's
+Naga mainnet** — decryption material is released only to wallets
+that currently satisfy the on-chain ownership check. The earlier
+v2.3 framing — that "open-tier permeability is intentional" via
+the deterministic key-derivation construction — is retired as a
+production posture under v2.4; that construction now survives only
+for the V4.1 deployment of public-domain content. Reports
 identifying vulnerabilities in the threshold-mediated production
-path, the burn-auction mechanics, or the staking and slashing
-flows are in scope and welcomed.
+path (Lit ACC evaluation correctness, transfer semantics,
+permanence guarantees) are in scope and welcomed. The certified
+tier (hardware-attested per-device key wrapping) addresses a
+distinct threat model — *endpoint protection during playback*
+against the legitimate viewer's own device — which threshold
+release does not address; reports there are also in scope.
 
 ## Smart contract scope
 
