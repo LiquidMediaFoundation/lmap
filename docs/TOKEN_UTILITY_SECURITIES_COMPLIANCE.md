@@ -93,15 +93,37 @@ films, not appreciation of digital assets.
 ### 4. Efforts of others — not the principal source of utility
 
 The principal utility (playing the film) is delivered by:
-- An immutable smart contract (no party can revoke access)
-- A symmetric encryption scheme with a deterministic key derivation
-  (open tier; see [`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §4)
+- An immutable smart contract (no party can revoke ownership)
+- AES-256-GCM chunked content encryption (well-known primitive, not
+  dependent on any party's secret keys)
+- Threshold-mediated key release evaluated against current on-chain
+  ownership (see [`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §4
+  and whitepaper §8). The threshold network is a distributed
+  substrate of stake-bonded nodes — initially Lit Protocol's Naga
+  mainnet during Year 0 bootstrap, transitioning to an LMAP-native
+  threshold network operated under Foundation governance from Year 1
 - Content stored on a public, content-addressed network (IPFS)
 
-The encrypted master key, once delivered to a holder, can be
-decrypted forever with or without any Wylloh-operated service. A
-holder's ability to use the token does not depend on the ongoing
-managerial efforts of any team.
+A holder's ability to use the token does not depend on the ongoing
+managerial efforts of Wylloh or any other single commercial party.
+The threshold network operates as distributed infrastructure with
+economic alignment via the LMA token's emission and slashing
+mechanics; this is structurally analogous to how Filecoin storage
+incentives align providers with the network's operational health
+without depending on Protocol Labs' managerial efforts.
+
+After a successful threshold-mediated decryption, the master key is
+cached locally on the holder's device (whitepaper §9). Offline
+playback continues indefinitely with no network involvement. Holders
+may export self-wrapped backups of their master keys for permanence
+beyond the threshold network's operational lifetime.
+
+The legacy V4.1 deployment uses a deterministic key-derivation
+construction in which the wrapping key is derivable from public
+on-chain data. This construction is retired for production use under
+whitepaper v3 §8 and persists only for already-tokenized
+public-domain content. New commercial content tokenizes against the
+threshold-mediated mechanism described above.
 
 ### Working conclusion
 
@@ -135,7 +157,14 @@ materials.
 The whitepaper v2.0 (April 2026) was edited specifically to remove
 investment-register phrasing that v1.0 contained ("financial
 participation," "potential appreciation," "direct financial interest
-in commercial success"). See git history for the edit.
+in commercial success"). See git history for the edit. Whitepaper v3
+(June 2026) introduces the LMA protocol token and its emission/burn
+mechanics; the analysis in this document predates v3 architectural
+ratification and **requires formal securities-counsel review before
+LMA token issuance**. The Foundation's incorporation as a Cayman
+Foundation Company (whitepaper §16.1) is a working commitment pending
+this review; both the structural decision and this analysis are
+subject to revision based on counsel's recommendations.
 
 ---
 
@@ -143,10 +172,14 @@ in commercial success"). See git history for the edit.
 
 ### Where the analysis is strongest
 
-- The deterministic key-derivation step at the open tier means
-  utility is delivered cryptographically and is not revocable by
-  any party. This significantly weakens the "efforts of others"
-  prong.
+- The threshold-mediated key release is distributed across stake-
+  bonded nodes operating under economic alignment, not a single
+  managerial entity. The "efforts of others" prong is weakened
+  because no single party's efforts gate utility — the network
+  operates as distributed infrastructure analogous to Filecoin's
+  storage layer.
+- Local key caching and self-wrapped backup export mean post-purchase
+  utility is durable to network outages or future shutdowns.
 - The 97.5/2.5 split is enforced by the contract, not by a
   managerial entity that could change terms.
 - Rights tiers are filmmaker-configured and stored on-chain at

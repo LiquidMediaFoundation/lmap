@@ -72,7 +72,7 @@ contact [contact@wylloh.com](mailto:contact@wylloh.com).
 
 ---
 
-## Decrypting content (open tier)
+## Decrypting content
 
 The IPFS-pinned content for each film is encrypted with AES-256-GCM
 in a chunked format documented at
@@ -104,17 +104,37 @@ The flow:
 6. Decrypt each 4-MiB chunk in sequence using the master key (each
    chunk has its own IV and GCM tag).
 
-The deterministic key-derivation step means an encrypted master key,
-once received, can be decrypted forever with or without the storage
-service. **This is intentional.** It is what makes the open tier
-genuinely platform-independent — anyone with the public protocol docs
-can write a 50-line CLI that downloads and decrypts an LMAP-tokenized film
-without ever touching any Wylloh-operated server.
+The legacy deterministic key-derivation construction is retired as a
+production model. It survives only for the V4.1 deployment of
+public-domain content (notably *The Cocoanuts*) — once a holder
+receives the encrypted master key under this construction, decryption
+proceeds from public inputs and ownership is not re-checked. This
+property was originally articulated as platform independence but was
+correctly identified as a security flaw under any commercial-content
+strategy: any party with the public chain data can derive the
+wrapping key and decrypt without holding the token. The construction
+is therefore appropriate for demonstrating the protocol's other
+mechanics on public-domain content, and not appropriate for new
+commercial content.
 
-For studio-grade content, the certified attestation tier (Layer 5,
-spec'd, not yet shipped) wraps content keys per-device using hardware
-secure elements. Implementation details in
-[`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §7.
+Production content uses **threshold-mediated key release**: a
+distributed network of stake-bonded nodes verifies current on-chain
+ownership at decryption time and collectively releases the master
+key only when the buyer's wallet currently satisfies the access
+condition. Transfers cause access to flow to the new holder
+automatically on the next decryption attempt — the threshold network
+evaluates `balanceOf` against live chain state, not against a
+historical snapshot. This provides security equivalent to or
+stronger than legacy hardware-attested DRM. Implementation details
+in [`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §4 and the
+whitepaper §8.
+
+Hardware-attested key wrapping (Layer 5) is supported as
+forward-compatibility for licensing relationships predicated on
+legacy industry compliance frameworks. It is not the load-bearing
+security layer; the protocol's security claim runs through threshold
+release. See [`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §7 and the
+whitepaper §8.4.
 
 ---
 

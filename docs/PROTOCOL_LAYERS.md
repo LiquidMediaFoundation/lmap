@@ -42,27 +42,42 @@ different layers as long as the interfaces are honored.
 | # | Layer | Responsibility | Status |
 |---|---|---|---|
 | 0 | Trust Anchors | Cryptographic primitives; hardware roots; wallet identity; contract immutability | Partial |
-| 1 | Storage | Content distribution substrate (IPFS, manifests) | Shipped (open tier) |
-| 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking | Shipped (open tier); spec'd (certified tier) |
-| 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers | Shipped (V4.1 distribution); spec'd (V5 copyright) |
+| 1 | Storage | Content distribution substrate (IPFS, manifests, stake-incentivized pinning) | Shipped (centralized pinning); spec'd (LMA-incentivized) |
+| 2 | Cryptography | Encryption, threshold-mediated key release, key hierarchy, watermarking | Shipped (chunked AES-GCM); in migration (threshold release via Lit Y0 → LMAP-native Y1+) |
+| 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, PaymentSplitter | Shipped (V4.1 distribution); spec'd (V5 copyright) |
 | 4 | Network | Peer discovery, shard request/response, LAN streaming | Future (depends on Seed reference implementation reaching v1) |
-| 5 | Attestation | Open tier / certified tier hardware attestation | Spec'd; not yet implemented |
+| 5 | Forward Compatibility | Optional hardware-attested key wrapping for legacy industry licensing frameworks | Spec'd; invoked per-content when contractually required |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling | Shipped (web client); future (TV/mobile) |
-| 7 | Governance | Foundation structure; federated certification; protocol governance | Future |
+| 7 | Governance | Foundation structure; federated issuance for Layer 5; protocol governance | Future |
 
 **Definition of layer status:**
 - *Shipped*: code is in the repo, deployed to mainnet (where applicable), used in production
 - *Spec'd*: design is specified in this or a companion doc but not yet implemented
 - *Future*: scope is identified but neither specified nor implemented; deliberate placeholder
 
-**Definition of "open tier" vs "certified tier"** (foreshadowing §6
-on Attestation): the protocol supports two distinct trust modes.
-*Open tier* runs on any compliant Seed implementation, with permissive
-content (public domain, indie, Creative Commons, opt-in creators).
-*Certified tier* requires hardware attestation from a Wylloh-trusted
-certification authority and gates studio-grade content. Both tiers
-run the same layered protocol; the gating is narrow and lives at
-Layer 5.
+**The protocol's security model is threshold-mediated key release**
+(Layer 2 §4.2). Access to a film's decryption material is gated by
+current on-chain ownership at decryption time, evaluated by a
+distributed network of stake-bonded nodes. The protocol claims, and
+intends to demonstrate, security equivalent to or stronger than
+legacy hardware-attested DRM.
+
+**Layer 5 is forward-compatibility, not a co-equal "tier."** Some
+licensing relationships — primarily those originating with major
+studios — reference specific hardware-DRM technologies as
+contractual conditions. The protocol's design includes forward-
+compatible support for hardware-attested key wrapping so these
+relationships can be honored. This support is invoked per-content
+when content metadata signals it; it is not engaged for the
+protocol's primary use cases. The relevance of Layer 5 decreases as
+industry compliance frameworks evolve to recognize threshold
+cryptography directly.
+
+Earlier versions of this document described a *two-tier* model
+(open tier + certified tier as parallel security modes). That
+framing has been retired; threshold-mediated release at Layer 2 is
+*the* security model, and Layer 5 hardware attestation exists at
+the periphery as forward-compatibility for legacy frameworks.
 
 ---
 
@@ -97,7 +112,9 @@ The cryptographic primitives everything above depends on.
   §4.3) uses TPM 2.0 (Infineon SLB9670) over SPI on the Pi 5. **Origin Seed**
   (`docs/seed-one/ORIGIN_SPEC.md` §5.2) uses a discrete secure element on the
   custom carrier PCB (NXP SE050 candidate) plus TPM 2.0 plus TrustZone. Both
-  SKUs run the same firmware with the same certified-tier capability.
+  SKUs run the same firmware with the same hardware-attestation
+  capability available for Layer 5 forward-compatibility when content
+  invokes it.
 
 **What this layer guarantees:**
 - A wallet's signature is unforgeable except by holding its private key
@@ -129,9 +146,11 @@ across the network.
   encrypted-film-chunks CID, encryption metadata (chunk size, IV
   scheme, version tag), rights tier definitions.
 - **Pinning policy** (shipped, partial). Wylloh's storage service
-  pins all registered film CIDs by default. As the Seed network
-  grows (Layer 4), pinning becomes distributed and self-strengthening
-  per the edge-CDN thesis (`docs/drafts/EDGE_CDN_THESIS.md`).
+  pins all registered film CIDs by default during bootstrap. As the
+  Seed network grows (Layer 4) and the LMA-incentivized
+  proof-of-retrievability mechanism (whitepaper §7) ships in Year 1,
+  pinning becomes distributed and self-strengthening. Centralized
+  pinning sunsets by end of Year 2.
 - **Threshold dispersal of shards** (spec'd, not implemented). Future
   enhancement: ciphertext sharded via Reed-Solomon erasure coding
   across Seeds, requiring quorum reconstruction. Provides resilience
@@ -433,8 +452,9 @@ and/or Origin) shipping at sufficient density.
   coordination
 
 **Interfaces above:**
-- Layer 5 (attestation) gates which Seeds can serve certified-tier
-  content
+- Layer 5 (forward compatibility) gates which Seeds can decrypt
+  content invoking the hardware-attested capability; carriage of
+  encrypted bytes is unrestricted
 - Layer 6 (application) consumes the LAN streaming protocol
 
 **Interfaces below:**
@@ -624,7 +644,8 @@ A few properties span multiple layers and deserve explicit treatment.
 Wallet identity (Layer 0) flows through every layer above it:
 - Layer 3 reads wallet for entitlement
 - Layer 4 reads wallet to gate Seed-to-Seed shard exchange (potentially)
-- Layer 5 ties certified-tier content key wrapping to user's wallet
+- Layer 5 binds the hardware-attested capability (when invoked) to
+  the user's wallet via per-device key wrapping
 - Layer 6 displays library based on wallet's token holdings
 
 This is intentional. The wallet is the single source of identity

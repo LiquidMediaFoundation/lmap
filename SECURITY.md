@@ -50,12 +50,22 @@ report those to the implementing party directly.
 ## Threat model
 
 The LMAP threat model is documented in `docs/PROTOCOL_LAYERS.md`,
-particularly §4 (Cryptography) and §7 (Attestation). The two-tier
-attestation model intentionally accepts open-tier permeability as
-a feature, not a weakness — see `docs/PROTOCOL_POSITIONING.md` §2
-for the reasoning. Reports that frame open-tier permeability as a
-vulnerability will be acknowledged and discussed but will likely
-not result in protocol changes.
+particularly §4 (Cryptography) and §7 (Attestation), and in the
+whitepaper §8. The protocol's security model is threshold-mediated
+key release with stake-based sybil resistance — access to
+decryption material is gated by current on-chain ownership at
+decryption time, evaluated by a distributed threshold network.
+Hardware-attested key wrapping is supported as forward-compatibility
+for licensing relationships predicated on legacy industry frameworks
+(see whitepaper §8.4); it is not the load-bearing security layer.
+
+The legacy deterministic key-derivation construction used in the
+V4.1 deployment (in which the wrapping key is derivable from public
+on-chain data) is retired as a production model and remains in
+operation only for the existing public-domain V4.1 tokens. Reports
+identifying vulnerabilities in the threshold-mediated production
+path, the burn-auction mechanics, or the staking and slashing
+flows are in scope and welcomed.
 
 ## Smart contract scope
 

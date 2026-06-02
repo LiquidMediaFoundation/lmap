@@ -26,15 +26,18 @@ The four problems LMAP exists to address.
 
 - **Problem:** Digital media is infinitely replicable; creators are
   often uncompensated.
-- **Solution:** A two-tier attestation model. The open tier accepts
-  permissive content (public domain, indie, Creative Commons) with
-  honest cryptographic protection paired with trust-based social
-  incentive. The certified tier provides hardware-attested per-device
-  key wrapping for studio-grade content where contractual DRM is
-  required. Royalties on every transfer flow back to creators
+- **Solution:** Threshold-mediated key release with stake-based sybil
+  resistance — decryption material is gated by current on-chain
+  ownership at decryption time, evaluated by a distributed network
+  of stake-bonded nodes. We claim, and intend to demonstrate,
+  security equivalent to or stronger than legacy hardware-attested
+  DRM, on an open-protocol substrate the latter structurally cannot
+  match. Royalties on every transfer flow back to creators
   automatically through the protocol contract.
 - **Impact:** Artists are compensated. Culture spreads naturally.
-  When you give a person trust, they become trustworthy.
+  When you give a person trust, they become trustworthy — and when
+  you give honest cryptography, you don't need to treat audiences as
+  adversaries.
 
 ### 4. Sovereignty: The Token, Not the Platform
 

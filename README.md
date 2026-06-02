@@ -63,15 +63,19 @@ lmap/
 ## Liquid Media Foundation
 
 LMAP is stewarded by the Liquid Media Foundation, an independent
-non-profit (in formation, structured as a 501(c)(6) trade
-association). The Foundation holds the LMAP specification under an
-open license, governs the certified-tier attestation framework,
-and publishes companion specifications for additional media types
-as those communities develop.
+non-profit (in formation, structured as a Cayman Foundation Company
+pending securities-counsel review). The Foundation holds the LMAP
+specification under an open license, operates the Liquid Media Chain
+sequencer during bootstrap, manages the LMA token's issuance and
+burn mechanics, stewards the forward-compatible attestation
+framework for licensing relationships predicated on legacy industry
+requirements, and publishes companion specifications for additional
+media types as those communities develop.
 
 The Foundation is structurally distinct from any commercial
-implementation — modeled on the Wi-Fi Alliance, USB-IF, and HDMI
-Forum precedents. No commercial entity controls LMAP.
+implementation — modeled on the Filecoin Foundation, Tezos
+Foundation, and Polkadot Web3 Foundation precedents. No commercial
+entity controls LMAP.
 
 ---
 
@@ -80,7 +84,9 @@ Forum precedents. No commercial entity controls LMAP.
 Wylloh ([wylloh.com](https://wylloh.com)) is the first commercial
 implementation of LMAP, focused on film distribution. Wylloh
 operates a storefront, a storage service, and the reference Seed
-device (the Origin) — all built on top of the LMAP protocol.
+devices (Seed One and Origin Seed) — all built on top of the LMAP
+protocol. Wylloh holds zero LMA and does not depend on token
+economics for its revenue.
 
 LMAP is open. Other commercial implementations — film, music,
 software, and beyond — are welcome.

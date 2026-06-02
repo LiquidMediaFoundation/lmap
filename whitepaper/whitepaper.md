@@ -25,11 +25,17 @@ determines usage rights — from personal viewing to theatrical exhibition
 content-addressed network and incentivized via an economic substrate
 operated on a dedicated Layer-2 chain. Access to decryption material is
 gated by current on-chain ownership at decryption time, evaluated by a
-threshold cryptographic network rather than by any single party. A
-hardware-attested mode exists optionally for content where contractual
-digital-rights management is required, governed by a federated
-attestation framework independent of any commercial operator. A network
-of user-operated nodes — *Seeds* — distributes content, inverting the
+threshold cryptographic network with stake-based sybil resistance rather
+than by any single party. We claim, and intend to demonstrate, that this
+model provides security equivalent to or stronger than legacy
+hardware-attested digital-rights management, on an open-protocol
+substrate that the latter structurally cannot match. Forward-compatible
+support for hardware-attested key wrapping exists in the protocol's
+design for licensing relationships predicated on legacy industry
+compliance frameworks; we expect those frameworks to evolve to recognize
+threshold cryptography as equivalent or stronger security over time, and
+the protocol's center of gravity is positioned accordingly. A network of
+user-operated nodes — *Seeds* — distributes content, inverting the
 conventional cost model: the network strengthens as viewership grows.
 Smart contracts automate royalty distribution on every transaction,
 including secondary sales where collectors can sell exhibition rights
@@ -192,7 +198,7 @@ comparable projects have failed.
 | 2 | Cryptography | Encryption, key hierarchy, threshold release, watermarking |
 | 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers, payment splitters |
 | 4 | Network | Peer discovery, shard request/response, LAN streaming |
-| 5 | Attestation | Optional hardware attestation for content where contractually required |
+| 5 | Forward Compatibility | Optional hardware-attested key wrapping for legacy industry licensing frameworks |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling |
 | 7 | Governance | Foundation structure; federated certification; protocol governance |
 
@@ -992,17 +998,30 @@ compromising individual privacy.
 
 The protocol does not attempt perfect copy protection. History
 demonstrates that technological restrictions on digital media
-inevitably fail while degrading legitimate user experience. Instead,
-the system aligns incentives such that ownership provides value
-beyond mere access — liquidity, permanence, community membership —
-making legitimate acquisition the rational choice.
+inevitably fail while degrading legitimate user experience —
+including the legacy hardware-DRM systems that this protocol claims
+to equal or exceed. Widevine L1 has been broken in production
+multiple times; PlayReady and FairPlay have had their own
+compromises. The premise that the user is an adversary, and that
+sufficient hardware can prevent extraction, has not held in practice.
+
+Instead, the protocol aligns incentives such that ownership provides
+value beyond mere access — liquidity, permanence, community membership
+— making legitimate acquisition the rational choice. The
+cryptographic enforcement that *is* present (threshold-mediated key
+release, §8) gates access by current on-chain ownership, evaluated
+by a network of stake-bonded nodes. This provides honest
+cryptographic protection against the systematic extraction case
+without treating audiences as adversaries.
 
 The analog hole — capture of content via camera or screen recording
 during legitimate playback — remains possible. Watermarking is the
 only mitigation, and watermark robustness against transcoding is an
 ongoing arms race. The protocol does not claim immunity from this
 class of attack; it claims that legitimate purchase confers economic
-benefits that bare ciphertext extraction does not.
+benefits that bare ciphertext extraction does not, and that
+forensic watermarking enables attribution of leaks to specific
+purchasers.
 
 When content is owned not by a distant corporation but by potentially
 many individual token holders, piracy dynamics shift. Unauthorized
@@ -1011,9 +1030,13 @@ enthusiasts. Token holders own copies of the work itself, aligning
 their interest with its integrity rather than its piracy. Social
 contracts, properly constructed, provide stronger protection than
 technological locks against the casual case; threshold-mediated
-release provides cryptographic protection against the systematic
-extraction case; attested mode provides hardware-attested protection
-against the case where contractual DRM is required.
+key release provides cryptographic protection against the systematic
+extraction case. These two mechanisms together are the protocol's
+security posture; they do not require — and do not depend on —
+hardware-attested per-device key custody. Where forward-compatible
+hardware-attested key wrapping is invoked for licensing relationships
+predicated on legacy industry frameworks (§8.4), it operates as an
+additional credential check, not as the load-bearing security layer.
 
 Physical media operated on similar principles. Copy protection on
 optical discs was trivially circumvented, yet the market thrived for
@@ -1024,25 +1047,27 @@ successful work, and secondary markets reward early adoption.
 
 A specific guidance for technical readers: when evaluating the
 protocol's claims, separate the *cryptographic claim* (threshold-
-mediated release with stake-based sybil resistance and, where
-required, per-device key wrapping at attested mode do not degrade
-with network scale) from the *operational claim* (legitimate purchase
-is more economically rational than extraction for participants in
-the network). Both claims hold, but they hold at different layers
-and under different threat models. The whitepaper is precise about
-this because the audiences this document serves — investors,
-developers, and studio business affairs — read the same words and
-need to extract the same meaning.
+mediated release with stake-based sybil resistance provides security
+equivalent to or stronger than legacy hardware-attested DRM, and does
+not degrade with network scale) from the *operational claim*
+(legitimate purchase is more economically rational than extraction
+for participants in the network). Both claims hold, but they hold at
+different layers and under different threat models. The whitepaper is
+precise about this because the audiences this document serves —
+investors, developers, and licensing counterparties — read the same
+words and need to extract the same meaning.
 
 ## 16. Governance and the Liquid Media Foundation {-}
 
 The protocol is governed by an independent foundation, structurally
 distinct from any commercial operator. The Liquid Media Foundation
 holds the protocol's intellectual property under a permissive
-open-source license, stewards the attestation framework, operates
-the Liquid Media Chain (§6) sequencer during bootstrap, manages the
-LMA token's issuance and burn mechanics, publishes the protocol
-specification, and operates as a protocol-neutral standards body.
+open-source license, operates the Liquid Media Chain (§6) sequencer
+during bootstrap, manages the LMA token's issuance and burn
+mechanics, stewards the forward-compatible attestation framework
+(§8.4) for licensing relationships predicated on legacy industry
+requirements, publishes the protocol specification, and operates as
+a protocol-neutral standards body.
 
 Commercial entities that build on the protocol — storefronts,
 hardware manufacturers, marketplace operators — are participants in
