@@ -1,10 +1,18 @@
 # LMAP — Layered Architecture
 
-> The canonical engineering reference for how LMAP
-> decomposes. Each layer is independently specifiable, testable, and
-> (where applicable) replaceable. Conflating layers — particularly
-> the entitlement layer with the cryptographic layer — is how
-> comparable projects have failed.
+> The canonical engineering reference for how LMAP (Liquid Media Access
+> Protocol) decomposes. Each layer is independently specifiable, testable,
+> and (where applicable) replaceable. Conflating layers — particularly
+> the entitlement layer with the cryptographic layer — is how comparable
+> projects have failed.
+>
+> **Note on stewardship (added 2026-06-02):** LMAP is stewarded by the
+> Liquid Media Foundation (LMF), not by Wylloh. Wylloh is the first
+> commercial implementation. The LMAP whitepaper v3 at
+> `docs/whitepaper/WHITEPAPER_V3.md` is the canonical full specification;
+> this document is the engineering reference for the layered decomposition.
+> Where this document and the whitepaper diverge, the whitepaper is
+> authoritative.
 >
 > **Audience:** developers building on the protocol, hardware
 > integrators, security auditors, technical partners, future
@@ -16,15 +24,17 @@
 >
 > **Companion documents:**
 > - `docs/PROTOCOL_POSITIONING.md` — the strategic and philosophical posture
-> - `docs/seed-one/ARCHITECTURE.md` — what the reference Seed *does*
-> - `docs/seed-one/INDUSTRIAL_DESIGN.md` — what the reference Seed *is*
-> - `docs/seed-one/ORIGIN_SPEC.md` — *how to actually build* the reference Seed
+> - `docs/seed-one/README.md` — Seed SKU strategy (Seed One Y0; Origin Y1)
+> - `docs/seed-one/ARCHITECTURE.md` — what a Seed *does* at the system level
+> - `docs/seed-one/SEED_ONE_SPEC.md` — *how to build* the Y0 affordable SKU
+> - `docs/seed-one/ORIGIN_SPEC.md` — *how to build* the Y1 brand-crown SKU
+> - `docs/seed-one/INDUSTRIAL_DESIGN.md` — what the Origin Seed *is*
 
 ---
 
 ## 1. Overview
 
-LMAP is decomposed into eight layers. Each layer has a
+The Wylloh protocol is decomposed into eight layers. Each layer has a
 defined responsibility, a published interface to the layers above and
 below it, and an implementation status. Different parties can build
 different layers as long as the interfaces are honored.
@@ -35,7 +45,7 @@ different layers as long as the interfaces are honored.
 | 1 | Storage | Content distribution substrate (IPFS, manifests) | Shipped (open tier) |
 | 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking | Shipped (open tier); spec'd (certified tier) |
 | 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers | Shipped (V4.1 distribution); spec'd (V5 copyright) |
-| 4 | Network | Peer discovery, shard request/response, LAN streaming | Future (V2 Seed architecture) |
+| 4 | Network | Peer discovery, shard request/response, LAN streaming | Future (depends on Seed reference implementation reaching v1) |
 | 5 | Attestation | Open tier / certified tier hardware attestation | Spec'd; not yet implemented |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling | Shipped (web client); future (TV/mobile) |
 | 7 | Governance | Foundation structure; federated certification; protocol governance | Future |
@@ -49,7 +59,7 @@ different layers as long as the interfaces are honored.
 on Attestation): the protocol supports two distinct trust modes.
 *Open tier* runs on any compliant Seed implementation, with permissive
 content (public domain, indie, Creative Commons, opt-in creators).
-*Certified tier* requires hardware attestation from an LMAP-trusted
+*Certified tier* requires hardware attestation from a Wylloh-trusted
 certification authority and gates studio-grade content. Both tiers
 run the same layered protocol; the gating is narrow and lives at
 Layer 5.
@@ -82,8 +92,12 @@ The cryptographic primitives everything above depends on.
   - **TPM 2.0** — an alternative or supplement; commonly available
     on modern SBCs
 
-  The reference Seed (`docs/seed-one/ORIGIN_SPEC.md` §5.2) targets
-  ARM TrustZone + a discrete secure element on the custom carrier PCB.
+  Reference Seed implementations target ARM TrustZone in combination with a
+  discrete or integrated secure element. **Seed One** (`docs/seed-one/SEED_ONE_SPEC.md`
+  §4.3) uses TPM 2.0 (Infineon SLB9670) over SPI on the Pi 5. **Origin Seed**
+  (`docs/seed-one/ORIGIN_SPEC.md` §5.2) uses a discrete secure element on the
+  custom carrier PCB (NXP SE050 candidate) plus TPM 2.0 plus TrustZone. Both
+  SKUs run the same firmware with the same certified-tier capability.
 
 **What this layer guarantees:**
 - A wallet's signature is unforgeable except by holding its private key
@@ -140,12 +154,13 @@ across the network.
 ## 4. Layer 2 — Cryptography
 
 Encryption, key hierarchy, content-key custody, and watermarking. The
-load-bearing security layer.
+load-bearing security layer. Whitepaper v3 §7 and §8 are the canonical
+specification; this section gives the engineering view.
 
-### 4.1 Symmetric encryption (shipped, open tier)
+### 4.1 Symmetric encryption (shipped)
 
 - **AES-256-GCM** for content at rest and in transit
-- **Chunked format** (open tier v1): `[Len(4b BE)][IV(12b)][Ciphertext+Tag(16b)]`
+- **Chunked format**: `[Len(4b BE)][IV(12b)][Ciphertext+Tag(16b)]`
   per 4 MiB chunk. Self-authenticating per chunk; supports streaming
   decryption with constant memory.
 - **Per-title content keys** derived via HKDF with domain separation;
@@ -154,87 +169,166 @@ load-bearing security layer.
 Specified in `client-v2/src/services/encryption.ts` and ported to
 Seed firmware. Spec is open; any compliant client can implement.
 
-### 4.2 Open-tier key derivation (shipped)
+### 4.2 Access to decryption keys — threshold-mediated release (the production model)
 
-- Master content key derivable from public on-chain data:
-  `SHA-256(contractAddress.toLowerCase() + ":" + tokenId + ":wylloh-v1")`
-- Encrypted master key stored in API response, returned after the
-  storage service verifies wallet ownership via on-chain
-  `balanceOf()` check
-- Once a holder has the encrypted master key, they can decrypt
-  forever, with or without the API. **This is intentional.** It is
-  what makes the open tier genuinely platform-independent — a
-  developer with the protocol docs can write a 50-line CLI that
-  downloads and decrypts an LMAP-tokenized film without ever touching any
-  Wylloh-operated server.
+LMAP's cryptographic security rests on a single principle: **access to
+a film's decryption material is gated by current on-chain ownership
+of the corresponding token, evaluated at decryption time by a
+threshold cryptographic network**. No party — not the foundation,
+not a storefront, not a hardware vendor, not the protocol's own
+contracts — can release decryption material to a wallet that does
+not currently satisfy the access condition.
 
-### 4.3 Certified-tier key wrapping (spec'd, not implemented)
+**Mechanism.** Master keys are random (32 bytes) at content
+preparation. The publisher encrypts the film with the master key
+using chunked AES-256-GCM, then submits the master key to the
+threshold network for encryption against a Distributed Key
+Generation public key. The threshold-encrypted master key is stored
+alongside the metadata; the film's metadata declares an Access
+Control Condition (typically `balanceOf(:userAddress, :tokenId) > 0`
+against the LMAP registry).
 
-For studio-licensed content and any title where forensic-grade
-attribution is required:
+At decryption, the client signs a SIWE-style authentication message,
+submits the threshold-encrypted master key and ACC to the threshold
+network, and threshold-network nodes independently verify the wallet
+signature and query current chain state. Decryption shares are
+released only if the ACC evaluates true; the client reassembles the
+master key and decrypts using the standard chunked-AES-GCM path.
 
-- **Per-device wrapping.** Content keys are wrapped to each certified
-  Seed's public key, derived from its secure element. Each Seed gets
-  a uniquely-wrapped instance of the key.
-- **Unwrap inside secure element.** Wrapped keys are decrypted only
-  inside the Seed's secure element; the unwrapped key never appears
-  in main memory or on disk.
-- **Issuance gate.** Wrapped keys are issued by certification
-  authorities only after the Seed presents a valid attestation
-  report (Layer 5).
-- **Revocation.** Compromised certified devices can be added to a
-  revocation registry (Layer 3); subsequent key issuance refuses
-  the revoked device's attestation.
+**Transfer behavior emerges from the architecture.** When a token
+moves from one wallet to another, the ACC is re-evaluated at the
+next decryption attempt. The seller no longer satisfies the
+condition; the buyer now does. No re-wrapping, no foundation
+involvement, no seller cooperation required.
 
-### 4.4 Watermarking (spec'd; provider TBD)
+**Bootstrap substrate (Year 0):** Lit Protocol's Naga mainnet provides
+the threshold-decryption network during bootstrap. Production-grade,
+operating against Polygon as an ACC chain, multi-year operational
+maturity. Year-0 commercial content is tokenized against Lit.
 
-- **Open tier:** server-side watermarking before download fulfillment.
-  The storage API embeds a per-wallet watermark when serving the
-  encrypted master key. Simple to implement; works for the trust
-  model where the open-tier API is part of the trust boundary.
-- **Certified tier:** Seed-side watermarking inside the secure
-  element at decryption time. Each playback inserts a per-wallet
-  forensic watermark before the plaintext leaves the secure
-  perimeter. Robust against transcoding requires commercial
-  watermarking IP — engagement with Verimatrix, NAGRA, or Irdeto is
-  the path to studio-grade implementation.
-- **Insertion-point invariant:** wherever watermarking happens, the
-  wallet identity is bound to the content before any plaintext bit
-  reaches a copy-able surface.
+**Native substrate (Year 1+):** The Liquid Media Foundation deploys
+an LMAP-native threshold network on the Liquid Media Chain (Layer 0;
+see whitepaper v3 §6). Nodes stake LMA, perform threshold operations,
+earn emission, are slashed for misbehavior. By end of Year 2 all
+production content has migrated; the Lit Protocol dependency is
+retired.
 
-### 4.5 The "security scales with N" thesis — what's actually claimed
+### 4.3 Legacy: the deterministic key derivation construction
 
-This thesis appears in technical communications and deserves precise
-articulation.
+Earlier protocol versions described an "open tier" in which the
+content-decryption wrapping key was deterministically derivable from
+public on-chain data using a documented formula:
 
-**Two distinct sub-claims, with different defensibility:**
+```
+wrappingKey = SHA-256(contractAddress.toLowerCase() + ":" + tokenId + ":wylloh-v1")
+```
 
-1. **Per-device key wrapping (certified tier) — strong claim.**
-   Compromising one certified Seed yields *that Seed's local content
-   only*. The network's aggregate exposure does not grow with network
-   size, because each certified device is its own isolated vault.
-   This is the load-bearing security claim, and it scales positively
-   with N.
+The encrypted master key was returned by a storage API after an
+on-chain `balanceOf()` check, but once any holder received the
+encrypted master key, decryption could proceed entirely from public
+inputs.
 
-2. **Threshold dispersal of ciphertext (storage layer) — modest
-   claim.** Sharding ciphertext across Seeds raises the per-shard
-   extraction cost. An attacker compromising one Seed gets 1/n of
-   the ciphertext; reconstructing the asset requires reaching the
-   reconstruction threshold k. This is real but bounded — a
-   motivated attacker can target enough Seeds to reach k. The
-   combinatorial-cost argument applies but does not produce
-   asymptotic security.
+This construction was articulated as a deliberate design choice in
+service of platform independence. Reviewed against the requirements
+of a production protocol for film distribution — independent or
+otherwise — it has been retired. The derivable-key construction does
+not gate decryption by current ownership: any party with the public
+chain data and the published metadata can derive the wrapping key,
+retrieve the encrypted master key, and decrypt the film without
+holding the token. The construction is appropriate for *demonstrating
+the protocol's other mechanics on public-domain content* (the role
+it played in the V4.1 deployment with *The Cocoanuts*) and is not
+appropriate for new commercial content.
 
-The honest summary: *per-device key wrapping at the certified tier
-provides security that does not degrade with scale; threshold
-dispersal provides resilience and modestly raises extraction cost.*
-Both are valuable; only the first is the load-bearing claim.
+The V4.1 deployment continues to serve already-tokenized
+public-domain content under the legacy construction; new content is
+tokenized against the threshold-mediated mechanism (§4.2).
 
-The open tier explicitly accepts permeability. See
-`docs/PROTOCOL_POSITIONING.md` §2 for the philosophical commitment
-that frames the open tier's design.
+### 4.4 Hardware-attested mode (optional, for studio content)
+
+A subset of content — primarily content licensed from major studios —
+is governed by contractual digital-rights management requirements
+that threshold release does not satisfy on its own, not because of
+cryptographic deficiency but because studio compliance frameworks
+predate threshold cryptography and reference specific hardware-DRM
+technologies. For these content classes the protocol provides a
+*hardware-attested mode* layered on top of threshold release.
+
+In hardware-attested mode:
+
+- **Per-device wrapping.** Each compliant Seed holds a per-device
+  keypair generated inside its hardware secure element. For attested
+  content, the threshold-released master key is additionally wrapped
+  to the Seed's per-device public key. Unwrapping occurs only inside
+  the secure element; the unwrapped key never appears in main memory.
+- **Attestation report at issuance.** Wrapped-key issuance requires
+  the Seed to present a fresh attestation report signed by its
+  secure element, containing current firmware measurements. The
+  report is verified against the Seed's attestation credential.
+- **Federated issuers.** Attestation credentials are issued by
+  federated authorities under the Liquid Media Foundation's framework
+  (see Layer 5, §7). No single issuer can unilaterally approve or
+  deny attestation; the framework's governance can revoke any issuer
+  whose practices fail audit.
+- **Revocation.** Compromised attested devices can be added to a
+  revocation registry; subsequent wrapped-key issuance refuses
+  revoked-device attestation.
+
+**Hardware binding is a normative requirement.** A compliant
+hardware-attested implementation MUST use a hardware secure element
+for keypair generation, key custody, key unwrapping, and attestation
+signing. An implementation that performs any of these operations
+outside a hardware secure element is not conformant.
+
+**Carriage versus playback.** Hardware-attested mode gates
+*decryption*, not *carriage*. Encrypted attested-mode content is
+freely distributable through the same content-addressed substrate.
+Tokens remain freely transferable across all wallets. Hardware
+attestation gates playback only.
+
+### 4.5 Watermarking
+
+Forensic watermarking binds a leak to a specific wallet, raising the
+cost of unauthorized distribution beyond the bare cryptographic
+extraction cost. Watermarks may be inserted server-side at
+content-preparation time (per-purchase variants delivered to specific
+wallets) or, for attested-mode content, Seed-side at decryption time
+inside the secure element, before plaintext leaves the secure
+perimeter.
+
+Robust watermarking against transcoding and adversarial filtering
+requires commercial watermarking implementations — engagement with
+Verimatrix, NAGRA, or Irdeto is the path to studio-grade robustness.
+
+### 4.6 Security claims — precise statements
+
+Three claims about how protocol security relates to network size,
+with different defensibility:
+
+1. **Threshold-mediated release with stake-based sybil resistance —
+   strong claim.** Compromising the threshold network requires either
+   compromising more than the slashing-tolerance threshold of
+   independently-staked nodes (economically irrational at scale) or
+   extracting cryptographic material from those nodes (each holds
+   only a share). The network's aggregate exposure does not grow
+   with network size.
+
+2. **Per-device key wrapping (attested mode) — strong claim.**
+   Compromising one attested Seed yields *that Seed's local content
+   only*. The network's aggregate exposure does not grow with
+   network size, because each attested device is its own isolated
+   vault.
+
+3. **Threshold dispersal of ciphertext (storage layer, future) —
+   modest claim.** Sharding ciphertext across Seeds raises the
+   per-shard extraction cost. An attacker compromising one Seed
+   gets 1/n of the ciphertext; reconstructing the asset requires
+   reaching the threshold k. This is real but bounded — a motivated
+   attacker can target enough Seeds to reach k. The combinatorial
+   cost argument applies but does not produce asymptotic security.
 
 **What this layer cannot do** (acknowledged honestly):
+
 - Eliminate the analog hole. Camera-pointed-at-screen capture remains
   possible. Watermarking is the only mitigation; watermark robustness
   is an ongoing arms race.
@@ -302,8 +396,8 @@ Polygon mainnet, immutable, and verified.
 ## 6. Layer 4 — Network
 
 Peer-to-peer protocol between Seeds, plus LAN streaming to playback
-apps. Future work — depends on the V2 Seed reference implementation
-shipping.
+apps. Future work — depends on the Seed reference implementation (Seed One
+and/or Origin) shipping at sufficient density.
 
 **Components (all spec'd, not yet implemented):**
 
@@ -328,7 +422,7 @@ shipping.
   HLS
 - DLNA explicitly not supported in v1 (legacy baggage outweighs
   compatibility benefit)
-- A LMAP-native protocol is a future option for higher-fidelity or
+- A Wylloh-native protocol is a future option for higher-fidelity or
   lower-latency requirements but not necessary for v1
 
 **What this layer guarantees:**
@@ -349,71 +443,113 @@ shipping.
 
 ---
 
-## 7. Layer 5 — Attestation (the keystone)
+## 7. Layer 5 — Forward Compatibility for Legacy Industry Frameworks
 
-The architectural answer to the open-protocol-vs-studio-trust tension.
-Two tiers, both running the same layered protocol underneath; the
-gating is narrow and lives at this layer.
+Threshold-mediated key release (Layer 2 §4.2) is the protocol's
+security model. LMAP claims, and intends to demonstrate, security
+equivalent to or stronger than legacy hardware-attested DRM through
+threshold cryptography with stake-based sybil resistance.
 
-### 7.1 Open tier
+Layer 5 exists not as a feature of the protocol's security model but
+as **forward-compatibility for legacy industry licensing frameworks**
+— specifically, frameworks originating with major studios that
+reference specific hardware-DRM technologies (Widevine L1, PlayReady,
+FairPlay) as contractual conditions of licensing. These frameworks
+predate threshold cryptography's deployment maturity. We expect them
+to evolve to recognize threshold cryptography directly; the
+hardware-attested capability at this layer exists so that licensing
+relationships predicated on the current frameworks can be honored
+without compromising the protocol's open-protocol participation
+properties.
 
-Any Seed implementation that follows the spec serves content licensed
-under permissive terms:
-- Public domain
-- Creative Commons
-- Indie creators who opt their content into open-tier distribution
+The protocol's center of gravity is threshold release at Layer 2.
+This layer's relevance decreases as industry compliance frameworks
+evolve to recognize threshold cryptography. Until they do, the
+protocol provides forward-compatibility; the framing is honest about
+what this is.
 
-Permissive encryption (Layer 2 §4.2) is sufficient. No hardware
-attestation required. Anyone can implement an open-tier Seed and
-serve open-tier content. Third-party clients (community VLC plugin,
-custom mobile app, etc.) are welcome.
+### 7.1 What the protocol does not require
 
-### 7.2 Certified tier
+The bulk of LMAP content — indie productions, public domain,
+Creative Commons, festival distributions, creator-direct releases —
+does not require this layer. Threshold-mediated release with
+stake-based sybil resistance provides their security model in full.
+Layer 5 has no operational role for the protocol's primary use
+cases.
 
-Seeds carrying hardware attestations from a federated certification
-authority. Required for studio-licensed content. Revocable. Audited.
+### 7.2 The hardware-attested capability, when invoked
 
-**Certification credential, technically:**
-- Each certified Seed holds a per-device keypair generated inside
-  its secure element (Layer 0)
-- The certification authority signs a credential binding the device
-  public key to a manifest of approved firmware measurements
-- A content-key issuance request includes a fresh attestation report
-  signed by the secure element, containing current firmware
-  measurements
-- The CA verifies the report against the device's credential and
-  issues a wrapped content key (Layer 2 §4.3) only on a clean match
+When a licensing counterparty's contract references hardware
+attestation as a condition, the capability operates as follows.
+Participating Seeds hold per-device keypairs generated inside their
+hardware secure elements (Layer 0). An attestation issuer verifies a
+Seed's hardware integrity (firmware measurements, supply-chain
+provenance, key custody) and signs a credential binding the Seed's
+device public key to a manifest of approved firmware measurements.
 
-**Reference attestation stack** for the Origin reference Seed:
-- Discrete secure element on the custom carrier PCB (NXP SE050 or
-  equivalent)
-- ARM TrustZone (Pi 5 supports it) for measured-boot verification
-- Per-device attestation key generated at first boot, never extractable
+When a Seed requests a wrapped content key for content under this
+capability, it includes a fresh attestation report signed by its
+secure element, containing current firmware measurements. The
+issuance authority verifies the report against the Seed's
+attestation credential and issues the wrapped content key only on a
+clean match. The wrapped key is decrypted only inside the Seed's
+secure element; the unwrapped key never appears in main memory or
+persistent storage.
 
-**Certification authority structure:**
-- Foundation-only at v1 launch (single CA — Liquid Media Foundation)
-- Federation milestone: at a defined network size or maturity
-  threshold, the CA opens to additional signers (independent
-  auditors, integrator-channel certifiers, academic partners)
-- Federation is a *visible commitment*, not an indefinite
-  promise — a public sunset milestone for the LMF-only
-  phase
+**Reference hardware capability** (Wylloh Seed reference
+implementations include the necessary hardware as forward-
+compatibility; whether the capability is invoked depends on the
+content):
 
-### 7.3 Both tiers run the same protocol
+- **Seed One:** TPM 2.0 (Infineon SLB9670) over SPI on the Raspberry
+  Pi 5; ARM TrustZone in the BCM2712 SoC.
+- **Origin Seed:** TPM 2.0 plus a discrete secure element (NXP SE050
+  candidate) on the custom carrier PCB; ARM TrustZone in the CM5
+  SoC.
 
-A user's library may contain both open-tier and certified-tier
-titles. The client app sees a unified library; the only difference is
-that certified-tier titles will refuse to play on a non-certified
-Seed.
+Both Seed reference implementations are forward-compatible with the
+hardware-attested capability when content requires it. The hardware
+is included in the reference designs so the protocol can honor
+legacy licensing frameworks during the transition period; it is not
+the basis of the protocol's primary security guarantee.
 
-Storefronts can sell into either tier. The protocol does not
-discriminate at the application layer — only at content-key issuance
-(Layer 2) and Seed eligibility (Layer 5).
+### 7.3 The federated issuance framework
 
-This is the architectural mechanism that lets LMAP stay genuinely
-open (anyone can implement, anyone can sell, anyone can build clients)
-while preserving a credible path to studio-licensed content (where
-contractual hardware attestation requirements live).
+When the hardware-attested capability is invoked, attestation
+credentials are signed by independent *attestation issuers*. An
+issuer is a party that verifies a Seed's hardware integrity and
+signs the credential. Issuers operate under a federated framework
+governed by the Liquid Media Foundation (whitepaper v3 §8.5, §16.2).
+
+No single issuer can unilaterally approve or deny attestation. The
+framework's governance can revoke any issuer whose practices fail
+audit. Counterparties negotiate with the framework, not with a
+single platform operator. The model is structurally analogous to the
+federation of certificate authorities that underpins the public
+web's TLS infrastructure: independent issuers, audited practices,
+root trust managed by a body distinct from any commercial
+participant.
+
+The framework launches with a single issuer (the Liquid Media
+Foundation itself) and a public commitment to federate at a defined
+milestone of network maturity. Federation is a visible commitment,
+not an indefinite promise. We note that the framework's relevance
+itself depends on the persistence of the legacy industry
+requirements that necessitated it; over time, both the issuer
+federation and the hardware-attested capability decrease in
+significance relative to threshold-mediated release.
+
+### 7.4 Carriage versus playback
+
+When invoked, the hardware-attested capability gates *decryption*,
+not *carriage*. Encrypted content under this capability is freely
+distributable through the same content-addressed substrate as all
+other LMAP content. Tokens remain freely transferable across all
+wallets. Hardware attestation, when invoked, gates playback only.
+This preserves user sovereignty (a buyer's ownership is unaffected
+by hardware availability) while honoring the legacy contractual
+requirement (decryption is impossible without an attested secure
+element).
 
 ---
 
@@ -436,7 +572,7 @@ permissionless at this layer: anyone can implement.
   - Apple TV (priority 2)
   - iOS / iPadOS (priority 3)
   - Web (already shipped at wylloh.com)
-- **Storefront SDK.** Future. Lets third parties build LMAP-
+- **Storefront SDK.** Future. Lets third parties build Wylloh-
   compatible storefronts without re-implementing protocol primitives.
 - **Integrator deployment tooling** (future). Provisioning,
   attestation enrollment, multi-room configuration, residential AV
@@ -472,12 +608,10 @@ How the protocol evolves over time. Future work.
   of identifiable stewards. Public sunset milestones commit the
   Foundation to transitioning these to broader governance.
 
-**Current state:** The Liquid Media Foundation is in formation —
-incorporation as a 501(c)(6) trade association is a funded milestone
-of the upcoming raise. Until incorporation completes, Wylloh's
-founding team operates in a stewardship role. This is the current
-bootstrap reality; the path to formal foundation governance is a
-documented 3-5 year arc.
+**Current state:** Foundation does not yet exist. Wylloh's founding
+team operates in a stewardship role. This is the current bootstrap
+reality; the path to formal foundation governance is a documented
+3-5 year arc.
 
 ---
 
@@ -497,22 +631,31 @@ This is intentional. The wallet is the single source of identity
 across the protocol. The wallet is never held by Seed hardware; phone-
 based wallets sign on the user's behalf.
 
-### 10.2 Open tier vs. certified tier separation runs through every layer
+### 10.2 The protocol's security model, plus forward-compatibility for legacy frameworks
 
-| Layer | Open tier | Certified tier |
+The protocol's security model is threshold-mediated key release at
+Layer 2 §4.2. Every production deployment runs through this model.
+The hardware-attested capability (Layer 2 §4.4, Layer 5) exists as
+forward-compatibility for legacy industry licensing frameworks that
+have not yet evolved to recognize threshold cryptography; it is
+invoked per-content when a licensing contract requires it.
+
+| Layer | LMAP protocol (all production content) | Forward-compat capability (when invoked by legacy licensing contracts) |
 |---|---|---|
-| 0 | Wallet only | Wallet + secure-element-attested device |
-| 1 | Standard IPFS pinning | Same, plus per-device wrapped manifest |
-| 2 | Public-data-derived keys (permeable by design) | Per-device-wrapped keys, hardware-bound (per-N security) |
-| 3 | Same registries | Same registries plus revocation list |
-| 4 | Any Seed can serve | Only certified Seeds can serve |
-| 5 | No attestation required | Hardware attestation required |
-| 6 | Any client app | LMAP-certified clients (or compatible ones) |
-| 7 | Foundation governs spec | Foundation + CAs govern certification |
+| 0 | Wallet | Wallet + secure-element-attested device |
+| 1 | IPFS + stake-incentivized pinning | Same |
+| 2 | Threshold-mediated key release (Lit Y0; LMAP-native Y1+) | Same, plus per-device key wrapping at the secure element |
+| 3 | Liquid Media Chain registries | Same, plus revocation registry |
+| 4 | Any compliant Seed can serve | Same encrypted bytes can be served by any Seed; only attested Seeds can decrypt |
+| 5 | Not engaged | Hardware attestation engaged |
+| 6 | Any client app | Forward-compat-capable clients |
+| 7 | Foundation stewards spec | Foundation + federated issuers manage the forward-compat capability |
 
-A useful frame: *the open tier is the protocol's permissionless
-default; the certified tier is the optional add-on that enables
-studio relationships without compromising the default.*
+A useful frame: *threshold-mediated release IS the protocol's
+security model. The hardware-attested capability is forward-
+compatibility for legacy industry frameworks; we expect those
+frameworks to evolve to recognize threshold cryptography directly,
+at which point the capability's relevance decreases.*
 
 ### 10.3 Layer ownership is not vertical
 
@@ -533,43 +676,68 @@ prevents the layered abstraction from collapsing into a monolith.
 ## 11. Quick reference layer map
 
 ```
-Layer 7 — Governance      ↑ (foundation, federation, voting)
+Layer 7 — Governance      ↑ (LMF stewardship, federation, token-holder voting)
 Layer 6 — Application     ↑ (storefronts, library UI, playback apps, integrator tools)
-Layer 5 — Attestation     ↑ (open tier / certified tier split)
+Layer 5 — Attestation     ↑ (optional, content-specific, federated)
 Layer 4 — Network         ↑ (Seed peer protocol, LAN streaming via HLS+mDNS)
-Layer 3 — Entitlement     ↑ (ERC-1155 distribution, ERC-721 copyright, royalties, staking)
-Layer 2 — Cryptography    ↑ (AES-256-GCM, two-tier keys, threshold dispersal, watermarking)
-Layer 1 — Storage         ↑ (IPFS, manifests, future shard dispersal)
-Layer 0 — Trust Anchors   ↑ (secure element, wallet keys, contract immutability)
+Layer 3 — Entitlement     ↑ (ERC-1155 distribution, ERC-721 copyright, royalties, PaymentSplitter, on Liquid Media Chain)
+Layer 2 — Cryptography    ↑ (AES-256-GCM, threshold-mediated release, optional attested wrapping, watermarking)
+Layer 1 — Storage         ↑ (IPFS, manifests, stake-incentivized pinning, future shard dispersal)
+Layer 0 — Trust Anchors   ↑ (secure element, wallet keys, contract immutability, Liquid Media Chain settlement)
 ```
 
 ---
 
-## 12. Open architectural questions (next 30-90 days)
+## 12. Decisions ratified in whitepaper v3 (formerly "open architectural questions")
 
-Decisions worth converging on:
+The architectural questions that lived at the end of earlier versions
+of this document have been answered in whitepaper v3:
 
-1. **Secure element family for the reference Seed.** Recommendation:
-   NXP SE050. Mature, attestable, $5-8/unit, well-supported tooling.
-2. **LAN streaming protocol.** Recommendation: HLS over HTTPS with
-   mDNS discovery. No DLNA in v1.
-3. **Foundation legal structure.** Recommendation: Cayman Foundation
-   Company. Less expensive than Swiss Stiftung, well-established for
-   crypto-adjacent protocols.
-4. **Initial certification authority.** Recommendation:
-   Foundation-only at v1, with a public commitment to federate at a
-   defined milestone.
-5. **Watermarking provider engagement.** Initiate conversations with
-   Verimatrix, NAGRA, Irdeto. Not blocking for v1; required for
-   studio engagement.
-6. **Threshold dispersal scheme.** Reed-Solomon erasure coding over
-   Shamir's secret sharing for ciphertext shards. Implementation
-   complexity vs. resilience benefit needs design tradeoff analysis.
-7. **DKG ceremony for early threshold key generation.** Centralized
-   at v1 (single trusted setup) vs. distributed from day one (more
-   complex, more credible).
+1. **Secure element family for the reference Seed.** NXP SE050 for
+   Origin Seed; TPM 2.0 (Infineon SLB9670) for Seed One. Both
+   hardware-attestation-capable.
+2. **LAN streaming protocol.** HLS over HTTPS with mDNS discovery.
+   No DLNA.
+3. **Foundation legal structure.** Cayman Foundation Company (working
+   commitment in whitepaper v3 §16.1; ratification pending
+   securities-counsel review attendant to LMA token issuance).
+4. **Initial attestation authority.** Foundation-only at launch with
+   public commitment to federate at a defined milestone of network
+   maturity. See whitepaper v3 §7.3 and §8.5.
+5. **Watermarking provider engagement.** Server-side watermarking
+   for standard content; secure-element-side watermarking for
+   attested-mode content. Commercial-provider engagement (Verimatrix,
+   NAGRA, Irdeto) is a 2026 milestone.
+6. **Threshold dispersal scheme.** Reed-Solomon erasure coding for
+   ciphertext shards is specified for a future protocol version;
+   not blocking for v1 launch.
+7. **DKG ceremony for threshold key generation.** Decentralized DKG
+   among stake-bonded threshold-network nodes; the Lit Protocol
+   bootstrap substrate provides the production-grade implementation
+   during Y0; LMAP-native DKG ceremony for the Y1+ native network.
+
+Decisions not yet ratified in whitepaper v3:
+
+- Final emission-curve parameters for LMA (specified in companion
+  token-economics document published with the Foundation's
+  incorporation)
+- Final stake minimums for storage-provider and threshold-network
+  participation (specified in companion documents)
+- Sequencer-decentralization consensus algorithm for the Liquid Media
+  Chain (specified in chain-architecture document published alongside
+  Y1 deployment)
 
 ---
 
-*Last updated: 2026-04-28. Living document. Expect refinement as
-each layer matures from spec to implementation.*
+*Last updated: 2026-06-02. Layer 2 (Cryptography) substantially
+rewritten to retire the legacy "open tier with deterministic key
+derivation" framing and to specify threshold-mediated key release as
+the production access-control mechanism (with hardware-attested mode
+as the optional layer for studio-content requirements). Layer 5
+(Attestation) updated correspondingly — no longer framed as a
+"two-tier" gate but as a per-content optional mode. Cross-layer
+table (§10.2) updated. Open architectural questions (§12) updated
+to reflect the decisions ratified in whitepaper v3. The eight-layer
+decomposition itself is unchanged; the changes are within Layer 2
+and Layer 5. Whitepaper v3 at `docs/whitepaper/WHITEPAPER_V3.md`
+remains the canonical full specification.*
