@@ -22,12 +22,15 @@ which each film exists as fungible tokens within a unified registry
 contract, with separate provision for copyright ownership. Token
 quantity determines usage rights — from personal viewing to theatrical
 exhibition — at thresholds configured per title. Encrypted content
-is stored on a content-addressed network. Two attestation tiers
-coexist within the protocol: an *open tier* that uses
-deterministically-derivable keys for permissive content, intentionally
-permeable to preserve platform-independent ownership; and a *certified
-tier* that uses hardware-attested per-device key wrapping for
-content where contractual digital-rights management is required. A
+is stored on a content-addressed network. Access to decryption
+material is gated by current on-chain ownership, evaluated at
+decryption time by a threshold cryptographic network, so that access
+moves with the token and no single party can release a key to a
+wallet that does not hold it. For content whose licensing
+contractually requires endpoint protection, a *certified tier* adds
+hardware-attested per-device key wrapping; a legacy
+deterministic-key construction survives only for public-domain
+demonstration content. A
 network of user-operated nodes — *Seeds* — distributes content,
 inverting the conventional cost model: the network strengthens as
 viewership grows. Smart contracts automate royalty distribution on
@@ -190,10 +193,10 @@ layer — is how comparable projects have failed.
 |---|---|---|
 | 0 | Trust Anchors | Cryptographic primitives; hardware roots; wallet identity; contract immutability |
 | 1 | Storage | Content distribution substrate (IPFS, manifests) |
-| 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking |
+| 2 | Cryptography | Encryption, key hierarchy, threshold-mediated key release, dispersal, watermarking |
 | 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers |
 | 4 | Network | Peer discovery, shard request/response, LAN streaming |
-| 5 | Attestation | Open tier / certified tier hardware attestation |
+| 5 | Attestation | Certified-tier hardware attestation (the open tier gates access at Layer 2) |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling |
 | 7 | Governance | Foundation structure; federated certification; protocol governance |
 
@@ -237,12 +240,17 @@ mechanism (see §7.4 for the precise scope of this claim).
 storage are shipped. Threshold ciphertext dispersal is specified for
 a future protocol version.
 
-## 7. Cryptography and the Two-Tier Attestation Model {-}
+## 7. Cryptography and the Two-Tier Access Model {-}
 
-The protocol resolves the open-protocol-versus-studio-trust tension
-at Layer 5 (attestation), not at Layer 2 (encryption). Two tiers run
-the same protocol underneath; the gating between them is narrow and
-hardware-attested.
+The protocol gates access in two ways, for two kinds of content. For
+permissive and indie content (the *open tier*), access is gated
+cryptographically at Layer 2 by threshold-mediated key release —
+honest access control that requires no special hardware on the
+client side. For content whose licensing contractually requires
+endpoint protection (the
+*certified tier*), the protocol adds hardware-attested per-device key
+wrapping at Layer 5. Both tiers run the same protocol underneath;
+they differ only in what stands between a holder and the plaintext.
 
 ### 7.1 Open Tier {-}
 
@@ -585,13 +593,13 @@ viewership: success is expensive. In the Seed network, increased
 viewership means more Seeds joining, distributing load across more
 nodes. Per-stream costs approach zero as the network grows. The
 system becomes more efficient at scale rather than more costly.
-Network participation may be incentivized through future token
-mechanisms (proof-of-storage rewards, bandwidth credits); in the
-near term, Seeds participate by default because their primary
-value to the operator is local — the films they own, accessible to
-LMAP-compatible playback clients on their local network — and
+Seeds participate by default because their primary value to the
+operator is local — the films they own, accessible to
+LMAP-compatible playback clients on their local network — so
 network participation is a beneficial side effect rather than the
-purchase rationale.
+purchase rationale. This is precisely the property that
+distinguishes a Seed from the token-incentivized storage networks
+whose hardware had no standalone value (§16).
 
 A reference Seed device — the *Origin* — is specified separately
 from this paper as a buildable open-hardware design. The protocol
@@ -738,11 +746,11 @@ relationship with one another, not a competitive one.
 Transactions settle in stablecoin to insulate buyers from
 cryptocurrency volatility. The current implementation uses USDC.e
 (bridged USDC) on Polygon. Settlement on Polygon means that buyers
-must currently hold both USDC.e and a small amount of MATIC to
+must currently hold both USDC.e and a small amount of POL to
 cover network gas — friction the protocol acknowledges as a
 near-term limitation rather than an intended feature. The
 architectural answer is account abstraction via ERC-4337 [^6]
-*paymaster contracts*: a paymaster pays MATIC gas on the user's
+*paymaster contracts*: a paymaster pays POL gas on the user's
 behalf, recovering the cost via a small USDC surcharge bundled into
 the transaction. The reference contract V5 exposes paymaster hooks
 allowing a paymaster contract to be wired in by foundation
@@ -1038,7 +1046,7 @@ adoption problem that has limited prior decentralized-CDN plays.
 and economic primitives this protocol relies upon. The protocol's
 contributions specific to film distribution are the dual-contract
 architecture (§3), the modular rights-stacking mechanism (§4), the
-two-tier attestation model (§7), the permanence guarantee (§8), and
+two-tier access model (§7), the permanence guarantee (§8), and
 the Seed-network distribution model (§9).
 
 ## 17. Conclusion {-}
@@ -1053,15 +1061,16 @@ distribution including on secondary sales, we ensure transparent
 creator compensation through markets that never existed for physical
 media.
 
-The two-tier attestation model resolves the perceived conflict
+The two-tier access model resolves the perceived conflict
 between open-protocol architecture and contractual studio trust
-requirements. The open tier accepts permissive content with
-intentional cryptographic permeability, in exchange for the
-platform-independence guarantee that makes the protocol durable.
-The certified tier provides hardware-attested per-device key
-wrapping for content where contractual DRM is required, governed
-by a federated attestation framework structurally independent from
-any commercial operator.
+requirements. The open tier gates access cryptographically through
+threshold-mediated key release — honest access control that moves
+with the token and depends on no single party — while accepting that
+endpoint extraction is not prevented, the same posture physical media
+took for decades. The certified tier provides hardware-attested
+per-device key wrapping for content where contractual DRM is required,
+governed by a federated attestation framework structurally independent
+from any commercial operator.
 
 The separation of distribution tokens from copyright ownership
 enables fluid rights markets while preserving creator control over
@@ -1199,6 +1208,16 @@ engineering milestone and the legacy derivable-key construction
 as retired-to-public-domain-scope. **The §16 comparison with prior
 work** is unchanged; we explicitly do not build a Filecoin/Helium-
 shaped token-incentive layer atop the same cautionary analysis.
+
+A consistency pass harmonized the framing sections that the v2.3
+baseline had carried forward unchanged — the abstract, the §5
+layered-architecture table, the §7 section opener and title (now
+"the Two-Tier Access Model"), the §9 Seed-incentive description, and
+the §17 conclusion — with the threshold-release production model
+described in §7.1 and §7.4. Those sections previously described the
+retired derivable-key open tier as the protocol's production
+mechanism and omitted threshold-mediated key release. Stale gas-token
+naming (MATIC → POL) was corrected in §10.7.
 
 The Wylloh Seed product line referenced in this document evolved
 during May 2026 implementation work into two reference SKUs (Seed
