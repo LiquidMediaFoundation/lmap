@@ -1121,7 +1121,15 @@ of this paper's publication:
   Completion of this migration is a prerequisite for tokenizing
   any commercial content; the V4.1 deployment continues to serve
   already-tokenized public-domain content under the legacy
-  construction during and after the migration.
+  construction during and after the migration. The Wylloh
+  reference implementation scopes the open-tier framing
+  described in §7.1 as a deliberate brand position rather than as
+  a tolerated limit — DRM-free post-decryption is disclosed as a
+  field in standard listing terms and marketed as vinyl-grade
+  ownership, with the social and economic incentives of legitimate
+  acquisition treated as load-bearing product logic. That framing
+  is implementation-level, not protocol-level; other compliant
+  implementations may scope the open tier differently.
 - **Specified, in active implementation (V5):** the LMAPRegistryV5
   reference contract for deployment on Polygon mainnet — adds the
   three-way revenue split (§10.1), publisher/author distinction
