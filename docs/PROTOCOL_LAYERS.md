@@ -47,7 +47,7 @@ different layers as long as the interfaces are honored.
 
 **Definition of "open tier" vs "compliant tier"** (foreshadowing §6
 on Attestation): the protocol supports two distinct trust modes.
-*Open tier* runs on any compliant Seed implementation, with permissive
+*Open tier* runs on any conformant Seed implementation, with permissive
 content (public domain, indie, Creative Commons, opt-in creators).
 *Compliant tier* requires hardware attestation from an LMAP-trusted
 certification authority and gates studio-grade content. Both tiers
@@ -156,7 +156,7 @@ load-bearing security layer.
   threshold_T`), so a lower tier never derives a higher one.
 
 Specified in `client-v2/src/services/encryption.ts` and ported to
-Seed firmware. Spec is open; any compliant client can implement.
+Seed firmware. Spec is open; any conformant client can implement.
 
 ### 4.2 Open-tier key release (v2.4)
 
@@ -210,9 +210,9 @@ forensic-grade attribution is required:
 - **Unwrap inside secure element.** Wrapped keys are decrypted only
   inside the Seed's secure element; the unwrapped key never appears
   in main memory or on disk.
-- **Issuance gate.** Wrapped keys are issued by certification
-  authorities only after the Seed presents a valid attestation
-  report (Layer 5).
+- **Issuance gate.** Wrapped keys are issued by the **key issuer**
+  (§glossary) only after the Seed presents a valid attestation report
+  that the **credential issuer** has certified (Layer 5).
 - **Revocation.** Compromised compliant devices can be added to a
   revocation registry (Layer 3); subsequent key issuance refuses
   the revoked device's attestation.
@@ -578,7 +578,7 @@ based wallets sign on the user's behalf.
 | 3 | Same registries | Same registries plus revocation list |
 | 4 | Any Seed can serve | Only compliant Seeds can serve |
 | 5 | No attestation required | Hardware attestation required |
-| 6 | Any client app | LMAP-compliant clients (or compatible ones) |
+| 6 | Any client app | LMAP-conformant clients (or compatible ones) |
 | 7 | Foundation governs spec | Foundation + CAs govern certification |
 
 A useful frame: *the open tier is the protocol's permissionless

@@ -10,7 +10,7 @@ Under LMAP, playback of protected content occurs on a **compliant device** — a
 
 This independence is a protocol requirement, not a preference. A participant's access to content they own must never be contingent on a third party's continued operation or business decisions; an access layer rented from an outside service would make every holder's ownership revocable by that service's fate — the dependency LMAP exists to remove. (Downloaded content therefore plays indefinitely offline; see §6.)
 
-**Compliant hardware is required; a particular manufacturer's hardware is not.** The requirement is a **public conformance specification** any manufacturer can build to — making concrete the protocol's existing commitment that "any compliant device can participate" (whitepaper §9). Certification (§4) verifies a device model against the public criteria; it is open, non-discriminatory, and privileges no implementer. Reference implementations exist to be copied, not to gate.
+**Compliant hardware is required; a particular manufacturer's hardware is not.** The requirement is a **public conformance specification** any manufacturer can build to — making concrete the protocol's existing commitment that "any conformant device can participate" (whitepaper §9). Certification (§4) verifies a device model against the public criteria; it is open, non-discriminatory, and privileges no implementer. Reference implementations exist to be copied, not to gate.
 
 **Two properties are kept conceptually distinct** — conflating them is a known category error, since they solve different threat models:
 

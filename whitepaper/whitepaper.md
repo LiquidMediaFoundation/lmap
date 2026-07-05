@@ -228,7 +228,7 @@ Encrypted content is stored in a chunked format
 (`[Length(4 bytes)][IV(12 bytes)][Ciphertext+Tag(16 bytes)]` per
 4-MiB chunk) which is self-authenticating per chunk and supports
 streaming decryption with constant memory. The format is documented
-in the protocol specification; any compliant client can implement
+in the protocol specification; any conformant client can implement
 encryption and decryption against it.
 
 A future enhancement at this layer is *threshold dispersal of
@@ -257,7 +257,7 @@ they differ only in what stands between a holder and the plaintext.
 
 ### 7.1 Open Tier {-}
 
-Any compliant Seed implementation serves content licensed under
+Any conformant Seed implementation serves content licensed under
 permissive terms — public domain, Creative Commons, indie creators
 who opt their content into open-tier distribution.
 
@@ -570,7 +570,7 @@ mechanisms operating in combination. First, after a client has
 successfully decrypted a film once via threshold-mediated key
 release, the master key is cached locally — in the browser's
 persistent storage, the Seed daemon's encrypted local storage, or
-any compliant client implementation's local persistence. Subsequent
+any conformant client implementation's local persistence. Subsequent
 playback of the same film does not contact the threshold network;
 the client decrypts directly from local state. Second, holders may
 export their master keys as user-encrypted backups — wrapped with
@@ -580,7 +580,7 @@ the user's passphrase enables playback in perpetuity, even if all
 foundation and threshold-network infrastructure ceases to exist.
 Third, the ownership record on the chain remains the durable source
 of truth; a holder who has lost both local cache and backup can
-re-acquire access through any compliant implementation of the
+re-acquire access through any conformant implementation of the
 protocol that still operates against the chain, because the
 wallet's holdings are recoverable from public data.
 
@@ -673,7 +673,7 @@ whose hardware had no standalone value (§16).
 A reference Seed device — the *Origin* — is specified separately
 from this paper as a buildable open-hardware design. The protocol
 does not require the Origin or any particular Seed implementation;
-any compliant device can participate.
+any conformant device can participate.
 
 *Implementation status:* an open-source reference Seed daemon is
 operational. It verifies wallet ownership directly against the

@@ -270,7 +270,7 @@ narrow: hardware attestation for premium content keys.
 |---|---|---|
 | Trust anchor | Wallet identity | Wallet + secure-element-attested device |
 | Encryption | AES-256-GCM + public-data key derivation | AES-256-GCM + per-device-wrapped keys |
-| Hardware required | None (any compliant Seed) | Compliant Seed with secure element |
+| Hardware required | None (any conformant Seed) | Compliant Seed with secure element |
 | Content scope | Public domain, indie, Creative Commons | Studio-licensed (long-horizon) |
 | Implementation status | Shipped today | Spec'd; reference implementation in development |
 
