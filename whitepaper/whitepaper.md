@@ -6,7 +6,7 @@
 
 Harrison Kavanaugh  ·  contact\@liquidmediafoundation.org
 
-*Version 2.4 — June 2026*
+*Version 2.5 — July 2026*
 
 </div>
 
@@ -23,11 +23,11 @@ contract, with separate provision for copyright ownership. Token
 quantity determines usage rights — from personal viewing to theatrical
 exhibition — at thresholds configured per title. Encrypted content
 is stored on a content-addressed network. Access to decryption
-material is gated by current on-chain ownership, evaluated at
-decryption time by a threshold cryptographic network, so that access
-moves with the token and no single party can release a key to a
-wallet that does not hold it. For content whose licensing
-contractually requires endpoint protection, a *certified tier* adds
+material is gated by current on-chain ownership, evaluated against
+live chain state by a native access layer, so that access moves with
+the token and no single party can release a key to a wallet that does
+not hold it. For content whose licensing
+contractually requires endpoint protection, a *compliant tier* adds
 hardware-attested per-device key wrapping; a legacy
 deterministic-key construction survives only for public-domain
 demonstration content. A
@@ -196,13 +196,13 @@ layer — is how comparable projects have failed.
 | 2 | Cryptography | Encryption, key hierarchy, threshold-mediated key release, dispersal, watermarking |
 | 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers |
 | 4 | Network | Peer discovery, shard request/response, LAN streaming |
-| 5 | Attestation | Certified-tier hardware attestation (the open tier gates access at Layer 2) |
+| 5 | Attestation | Compliant-tier hardware attestation (the open tier gates access at Layer 2) |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling |
 | 7 | Governance | Foundation structure; federated certification; protocol governance |
 
 A storefront (Layer 6) only needs to read entitlement (Layer 3); a
 Seed manufacturer needs to implement Layers 1, 2, 4, and optionally
-5; an academic auditor of the certified tier only needs to engage
+5; an academic auditor of the compliant tier only needs to engage
 with Layer 5 and the cryptographic claims of Layer 2. Each layer
 should be specifiable, testable, and replaceable independently of
 the others. The protocol does not mandate that any single party
@@ -248,7 +248,7 @@ cryptographically at Layer 2 by threshold-mediated key release —
 honest access control that requires no special hardware on the
 client side. For content whose licensing contractually requires
 endpoint protection (the
-*certified tier*), the protocol adds hardware-attested per-device key
+*compliant tier*), the protocol adds hardware-attested per-device key
 wrapping at Layer 5. Both tiers run the same protocol underneath;
 they differ only in what stands between a holder and the plaintext.
 
@@ -304,13 +304,19 @@ attempt. The seller's wallet no longer satisfies `balanceOf > 0`;
 the buyer's now does. No re-wrapping, no foundation involvement,
 no seller cooperation required.
 
-LMAP integrates with Lit Protocol's Naga mainnet as the threshold-
-network substrate. Lit is a production-grade threshold-decryption
-network with established Polygon Access Control Condition support
-and multi-year operational maturity. The choice of Lit reflects
-that the threshold-release primitive is well-served by an existing
-distributed implementation; LMAP does not need to build its own
-threshold network to gain its security properties.
+The threshold-release primitive is substrate-independent: any
+threshold-decryption network that can evaluate a Polygon Access
+Control Condition and return decryption shares can serve it. LMAP's
+production access layer is **native** — the same federated framework
+that issues compliant-tier attestation credentials (§7.3) operates
+and progressively decentralizes the threshold network, so no single
+external service stands between a holder and content they own. Where
+a mature external threshold network is used as an interim substrate
+during bring-up, it is exactly that: a swappable bridge behind a
+stable interface, never a dependency the protocol's guarantees rest
+on. The protocol's rule is that the access layer must not be
+rentable from, or revocable by, any party outside the federated
+framework.
 
 **What the open tier provides honestly.** Threshold-mediated key
 release is *access control*: it gates which wallets can obtain a
@@ -321,24 +327,24 @@ unauthorized copy of content they legitimately decrypted. Defense
 against that case rests on social incentive, the ease of legitimate
 purchase, the alignment of buyers with creators, forensic
 watermarking (§7.5), and — where licensing contracts demand it —
-the certified tier (§7.2). The open tier is approximately
+the compliant tier (§7.2). The open tier is approximately
 DVD-level protection at the playback edge: cryptographic
 enforcement of access; honest acknowledgment that the analog hole
 and post-decryption copy are not prevented.
 
-### 7.2 Certified Tier {-}
+### 7.2 Compliant Tier {-}
 
 Studios and rights holders who require contractual digital-rights
-management cannot use the open tier as-is. The certified tier
+management cannot use the open tier as-is. The compliant tier
 provides hardware-attested per-device key wrapping for content where
 this is required.
 
-In the certified tier:
+In the compliant tier:
 
-- Each certified Seed holds a per-device keypair generated inside its
+- Each compliant Seed holds a per-device keypair generated inside its
   hardware secure element. The private key is non-extractable.
-- Content keys are wrapped to each certified Seed's public key.
-  Compromising one certified Seed yields *that Seed's local content
+- Content keys are wrapped to each compliant Seed's public key.
+  Compromising one compliant Seed yields *that Seed's local content
   only*; the network's aggregate exposure does not grow with the
   network's size.
 - Wrapped keys are unwrapped only inside the secure element. The
@@ -349,7 +355,7 @@ In the certified tier:
   current firmware measurements. The report is verified against the
   Seed's attestation credential before any wrapped key is issued.
 
-Reference hardware for the certified tier includes ARM
+Reference hardware for the compliant tier includes ARM
 TrustZone [^12]-capable SoCs with discrete secure elements (e.g.,
 NXP SE050 or equivalent), or platforms with TPM 2.0 [^4] support.
 Remote attestation [^5] follows established patterns from
@@ -357,23 +363,23 @@ contemporary trusted-computing literature. Per-title content keys
 are derived from a master with HKDF-style domain-separated key
 derivation [^11] to prevent key reuse across titles.
 
-**Hardware binding is a normative requirement of the certified tier.**
-A compliant certified-tier implementation MUST use a hardware secure
+**Hardware binding is a normative requirement of the compliant tier.**
+A compliant compliant-tier implementation MUST use a hardware secure
 element to (a) generate the per-device keypair, (b) hold the private
 key in non-extractable form, (c) perform key unwrapping, and (d) sign
 attestation reports. An implementation that performs any of these
 operations outside a hardware secure element is not conformant with
 LMAP V6 and MUST NOT be marketed as such. This is the protocol-level
-guarantee studios rely on when authorizing content for the certified
+guarantee studios rely on when authorizing content for the compliant
 tier. Wire-level specifics of the attestation report format, the
 attestation credential schema, and the issuer federation protocol are
 committed to a separate LMAP V6 technical specification, forthcoming.
 
 A clarifying distinction: only the *decryption* step requires
-certified hardware. Encrypted certified-tier content is freely
+compliant hardware. Encrypted compliant-tier content is freely
 distributable through the same content-addressed substrate as
 open-tier content — any device can hold, pin, or serve it. Tokens
-remain freely transferable across all wallets. The certified tier
+remain freely transferable across all wallets. The compliant tier
 gates *playback*, not *carriage*. This preserves user sovereignty (a
 buyer's ownership is unaffected by hardware availability; they can
 transfer their token at any time) while satisfying the studio
@@ -382,9 +388,32 @@ element). The architectural model mirrors theatrical distribution
 under DCI: the encrypted DCP is portable and freely distributable;
 only certified projectors with KDM-bound keys can play.
 
+**One active copy: binding and release.** Per-device wrapping gives
+the compliant tier a property the open tier does not have —
+enforceable scarcity. A wrapped key is *bound* to one secure element
+at a time, and each token carries an on-chain status of `bound` or
+`released`. A bound copy plays indefinitely offline; the binding is
+recorded, never re-verified, so playback never contacts the network.
+To transfer a token, the holder first *releases* it: the bound device
+deletes its wrapped key, and the status flips to `released`. A
+conforming marketplace settles a sale only against a `released`
+token, atomically with payment and royalty, so a buyer can never
+acquire a copy that is still bound elsewhere; a raw token transfer
+outside a conforming marketplace is caveat emptor, and wallets warn
+on a `bound` token. If a bound device is lost or destroyed, playback
+of its already-bound content is unaffected (it fails open) and the
+token's transferability is recovered by the owner after a
+heartbeat-timeout window — owner-initiated, never automatic. This
+restores one-copy-per-token scarcity, and with it collectible and
+resale value, without any continuous ownership check: enforcement
+occurs only at the discrete moments of binding and release. The
+residual — a compromised device that reports `released` while
+retaining its copy — is bounded, forensically watermarked (§7.5),
+and does not affect a buyer's guarantee of a working title.
+
 ### 7.3 Attestation Issuers and the Federated Framework {-}
 
-Attestation credentials in the certified tier are signed by
+Attestation credentials in the compliant tier are signed by
 independent *attestation issuers*. An issuer is a party that verifies
 a Seed's hardware integrity and signs a credential binding the
 device's public key to a manifest of approved firmware measurements.
@@ -416,7 +445,7 @@ obtain a decryption key only while that wallet currently holds the
 relevant token. Transfers cause access to move with the token; the
 seller's next decryption attempt fails the on-chain check; the
 buyer's succeeds. The threshold network is a distributed substrate
-of cryptographic nodes (Lit Protocol's Naga mainnet); no single
+of cryptographic nodes native to the protocol; no single
 party — not the foundation, not Wylloh, not the protocol's own
 contracts — can release a key to a wallet that does not currently
 satisfy the access condition. **What threshold release does not do:**
@@ -426,9 +455,9 @@ have legitimately decrypted it. That is the analog hole and the
 post-decryption copy. Threshold release does not address those
 threats — and we do not claim that it does.
 
-**Certified tier (hardware-attested per-device key wrapping).** This
+**Compliant tier (hardware-attested per-device key wrapping).** This
 is *endpoint protection*. Hardware-attested DRM (Widevine L1,
-PlayReady, FairPlay, and LMAP's certified tier) constrains what
+PlayReady, FairPlay, and LMAP's compliant tier) constrains what
 the device can do with the decrypted stream during playback,
 *against the device's own owner*. The decryption happens inside a
 hardware secure element; the plaintext key never appears in main
@@ -443,7 +472,7 @@ attempting to capture.
 **These are not equivalent.** They solve different threat models:
 threshold release gates *who gets the key*; hardware DRM gates
 *what the device does with the key*. The two tiers compose well —
-the certified tier in LMAP runs threshold release at the access
+the compliant tier in LMAP runs threshold release at the access
 layer and adds per-device hardware wrapping at the playback layer
 — but the two layers are not substitutes for one another. The
 protocol claims threshold release at the open tier is honest and
@@ -451,7 +480,7 @@ sufficient for indie, public-domain, Creative Commons, and
 creator-opt-in content, where extraction at the playback edge is
 acceptable defense rested on social incentive plus watermarking.
 For content where licensing contracts demand endpoint protection,
-the certified tier provides it.
+the compliant tier provides it.
 
 **A modest supplementary claim — threshold dispersal of ciphertext
 (storage layer).** Sharding ciphertext across Seeds raises the
@@ -469,7 +498,7 @@ Forensic watermarking binds a leak to a specific wallet, raising the
 cost of unauthorized distribution beyond the bare cryptographic
 extraction cost. In the open tier, a watermark may be inserted
 server-side by a storage service when fulfilling a download. In the
-certified tier, watermarks are inserted Seed-side at decryption time,
+compliant tier, watermarks are inserted Seed-side at decryption time,
 inside the secure element, before plaintext leaves the secure
 perimeter.
 
@@ -484,12 +513,12 @@ storage are shipped on Polygon mainnet via the V4.1 registry.
 *The Cocoanuts* (1929, public domain) was tokenized and decrypted
 end-to-end across two independent architectures (macOS arm64,
 Raspberry Pi aarch64) using the legacy deterministic key-derivation
-construction. **Threshold-mediated key release via Lit Protocol's
-Naga mainnet is the new production access-control mechanism** and
+construction. **Native threshold-mediated key release is the new production
+access-control mechanism** and
 is in active migration in the Wylloh reference implementation; the
 migration must complete before any commercial title is tokenized
 on the protocol, and is the highest-priority near-term engineering
-milestone. Certified tier (per-device key wrapping, hardware
+milestone. Compliant tier (per-device key wrapping, hardware
 attestation, federated issuers) is specified at the protocol level
 with hardware-binding declared normative (§7.2); the wire-level
 attestation specification, the framework's first issuer, governance
@@ -536,16 +565,16 @@ it, while threshold release supersedes the construction for new
 content.
 
 The canonical claim, stated precisely: *downloaded films play
-forever offline; re-download and transfer require the access
-network (Lit Protocol's Naga mainnet) to be live; no single-company
+forever offline; re-download and transfer require the native access
+network to be live; no single-company
 point of failure.*
 
-In the certified tier, this guarantee is engineered. Attestation
+In the compliant tier, this guarantee is engineered. Attestation
 gates the *issuance* of wrapped keys, not the *playback* of content
 already keyed. A Seed whose attestation credential is later revoked
 retains the wrapped keys it previously received and continues to
 play the corresponding films. Revocation prevents the Seed from
-acquiring further content through the certified tier; it does not
+acquiring further content through the compliant tier; it does not
 retroactively disable the Seed's existing library. This is the
 architectural answer to the rugpull pattern that has characterized
 streaming services and digital media stores.
@@ -555,7 +584,7 @@ secure element fails physically loses access to its locally-wrapped
 keys. The protocol mitigates this by treating the on-chain ownership
 record as the durable source of truth. A user whose Seed has died
 can re-acquire wrapped keys for their owned films onto a new
-certified Seed, because the wallet's holdings are recoverable from
+compliant Seed, because the wallet's holdings are recoverable from
 the blockchain. **The blockchain remembers; the hardware is
 replaceable.** This is a stronger guarantee than physical media,
 which has no equivalent recovery path when a disc fails.
@@ -867,13 +896,13 @@ their interest with its integrity rather than its piracy.
 Social contracts, properly constructed, provide stronger protection
 than technological locks against the casual case; threshold-mediated
 key release provides honest cryptographic access control against the
-non-holder case; and the certified tier provides hardware-attested
+non-holder case; and the compliant tier provides hardware-attested
 endpoint protection against the case where licensing contracts
 require it. These mechanisms address different threat models, and
 the whitepaper is precise about the distinction: threshold release
-gates *who gets the key*; hardware attestation in the certified tier
+gates *who gets the key*; hardware attestation in the compliant tier
 gates *what the device does with the key during playback*. The two
-are complementary in the certified tier; threshold release alone is
+are complementary in the compliant tier; threshold release alone is
 sufficient and honest for the open tier.
 
 Physical media operated on similar principles. Copy protection on
@@ -891,7 +920,7 @@ key release correctly gates decryption by current on-chain
 ownership, evaluated by a distributed network of cryptographic
 nodes, with no single party able to release a key to a
 non-holder. (2) The *endpoint-protection claim*: hardware-attested
-per-device key wrapping at the certified tier constrains what the
+per-device key wrapping at the compliant tier constrains what the
 playback device can do with the decrypted stream, addressing the
 legitimate-viewer-attempting-capture threat that no software-only
 mechanism can address. (3) The *operational claim*: legitimate
@@ -916,7 +945,7 @@ account-locked stores provide.
 The protocol is governed by an independent foundation, structurally
 distinct from any commercial operator. The foundation holds the
 protocol's intellectual property under a permissive open-source
-license, stewards the certified-tier attestation framework,
+license, stewards the compliant-tier attestation framework,
 publishes the protocol specification, and operates as a
 protocol-neutral standards body.
 
@@ -938,7 +967,7 @@ The foundation, at its mature governance, will steward:
   proposals, and version transitions.
 - **The attestation framework.** Maintaining the federation of
   attestation issuers, audit standards, and revocation governance for
-  the certified tier (§7.3).
+  the compliant tier (§7.3).
 - **Treasury.** Custody of the protocol fee revenue, application to
   shared infrastructure costs, and grants to ecosystem development.
 - **Token-holder governance.** Per-title decisions (royalty splits,
@@ -1067,7 +1096,7 @@ requirements. The open tier gates access cryptographically through
 threshold-mediated key release — honest access control that moves
 with the token and depends on no single party — while accepting that
 endpoint extraction is not prevented, the same posture physical media
-took for decades. The certified tier provides hardware-attested
+took for decades. The compliant tier provides hardware-attested
 per-device key wrapping for content where contractual DRM is required,
 governed by a federated attestation framework structurally independent
 from any commercial operator.
@@ -1117,7 +1146,7 @@ of this paper's publication:
 - **In active migration (blocking commercial-content
   onboarding):** migration of the Wylloh reference web client and
   Seed daemon from the legacy derivable-key construction to
-  threshold-mediated key release via Lit Protocol's Naga mainnet.
+  native threshold-mediated key release.
   Completion of this migration is a prerequisite for tokenizing
   any commercial content; the V4.1 deployment continues to serve
   already-tokenized public-domain content under the legacy
@@ -1148,14 +1177,14 @@ of this paper's publication:
 - **Specified, future protocol versions (V6+):** ERC-721 copyright
   registry; on-chain staking for commercial-exhibition windows;
   presale-funding milestone-escrow contracts; threshold dispersal
-  of ciphertext shards; certified-tier attestation framework with
+  of ciphertext shards; compliant-tier attestation framework with
   federated issuers and **normatively-required hardware-attested
   per-device key wrapping** (§7.2). The wire-level attestation
   specification (report format, credential schema, issuer federation
   protocol, revocation flow) is committed to a separate LMAP V6
   technical specification, forthcoming.
 - **Long-horizon (operational maturity required):** studio-grade
-  certified-tier engagement with major rights holders.
+  compliant-tier engagement with major rights holders.
 
 This paper is a working specification. Components shipped today
 behave as described; components specified are commitments the
@@ -1166,6 +1195,30 @@ living public artifact.
 \vspace{1em}
 
 ## Changelog {-}
+
+**Version 2.5 (July 2026).** Forward-ports the access-control
+refinements settled after v2.4. (1) **The access layer is native.**
+The threshold-release primitive is stated as substrate-independent
+(§7.1); no specific external threshold network is named as the
+production substrate. The protocol's rule is that the access layer
+must not be rentable from, or revocable by, any party outside the
+Foundation's federated framework; an external network may serve only
+as a swappable interim bridge behind a stable interface. (2) **The
+"certified tier" is renamed the "compliant tier"** throughout, naming
+the tier by the open conformance standard a device meets rather than
+by an authority's grant. (3) **A binding model is added to the
+compliant tier (§7.2).** Per-device wrapping now carries an on-chain
+`bound`/`released` status: a copy binds to one secure element at a
+time, plays offline indefinitely, and must be *released* — the device
+deletes its wrapped key — before its token can be transferred; a
+conforming marketplace settles only against a released token,
+atomically with payment and royalty, and a heartbeat-timeout,
+owner-initiated recovery covers lost devices. This restores
+one-copy-per-token scarcity, and with it collectible and resale
+value, without any continuous ownership check — resolving the
+sovereignty-versus-scarcity tension in favor of both. Companion
+documents (`PROTOCOL_LAYERS.md`, `PROTOCOL_POSITIONING.md`) are
+updated in step.
 
 **Version 2.4 (June 2026).** Supersedes v3.0 (also June 2026)
 following external architectural review. v3.0 attempted to add an
@@ -1244,14 +1297,14 @@ no dependency on any centralized service. The daemon's operating
 behavior — IPFS fetch with local Kubo preference, automatic
 content pinning to make the Seed a provider, LAN-streaming via
 HTTP/mDNS with byte-range support — is documented as the
-canonical reference behavior for compliant Seeds. §7.2 (Certified
+canonical reference behavior for compliant Seeds. §7.2 (Compliant
 Tier) gains a normative statement: hardware binding (SE-resident
 keypair generation, non-extractable private keys, in-SE key
 unwrapping, in-SE attestation signing) is a MUST for V6
 conformance, and an implementation omitting any of these operations
 is not LMAP-V6-conformant and MUST NOT be marketed as such. A
 clarifying paragraph distinguishes *playback* (which requires
-certified hardware) from *carriage* (which does not — tokens,
+compliant hardware) from *carriage* (which does not — tokens,
 encrypted content, and pinning remain freely accessible across all
 hardware), mirroring DCI theatrical distribution. Wire-level
 attestation specifics (report format, credential schema, issuer

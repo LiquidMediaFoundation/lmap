@@ -33,10 +33,10 @@ different layers as long as the interfaces are honored.
 |---|---|---|---|
 | 0 | Trust Anchors | Cryptographic primitives; hardware roots; wallet identity; contract immutability | Partial |
 | 1 | Storage | Content distribution substrate (IPFS, manifests) | Shipped (open tier) |
-| 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking | Shipped (open tier); spec'd (certified tier) |
+| 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking | Shipped (open tier); spec'd (compliant tier) |
 | 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers | Shipped (V4.1 distribution); spec'd (V5 copyright) |
 | 4 | Network | Peer discovery, shard request/response, LAN streaming | Future (V2 Seed architecture) |
-| 5 | Attestation | Open tier / certified tier hardware attestation | Spec'd; not yet implemented |
+| 5 | Attestation | Open tier / compliant tier hardware attestation | Spec'd; not yet implemented |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling | Shipped (web client); future (TV/mobile) |
 | 7 | Governance | Foundation structure; federated certification; protocol governance | Future |
 
@@ -45,11 +45,11 @@ different layers as long as the interfaces are honored.
 - *Spec'd*: design is specified in this or a companion doc but not yet implemented
 - *Future*: scope is identified but neither specified nor implemented; deliberate placeholder
 
-**Definition of "open tier" vs "certified tier"** (foreshadowing §6
+**Definition of "open tier" vs "compliant tier"** (foreshadowing §6
 on Attestation): the protocol supports two distinct trust modes.
 *Open tier* runs on any compliant Seed implementation, with permissive
 content (public domain, indie, Creative Commons, opt-in creators).
-*Certified tier* requires hardware attestation from an LMAP-trusted
+*Compliant tier* requires hardware attestation from an LMAP-trusted
 certification authority and gates studio-grade content. Both tiers
 run the same layered protocol; the gating is narrow and lives at
 Layer 5.
@@ -71,7 +71,7 @@ The cryptographic primitives everything above depends on.
   logic on Polygon V4.1 cannot be retroactively modified. Future
   upgradeability uses deliberate proxy patterns with multisig
   governance, never unilateral admin keys.
-- **Hardware roots of trust** (spec'd, not yet implemented). Certified
+- **Hardware roots of trust** (spec'd, not yet implemented). Compliant
   Seeds will carry secure elements with non-extractable key custody
   and remote-attestation capability. Reference candidates:
   - **NXP SE050** — mature, well-tooled, $5-8/unit, supports remote
@@ -88,13 +88,13 @@ The cryptographic primitives everything above depends on.
 **What this layer guarantees:**
 - A wallet's signature is unforgeable except by holding its private key
 - A deployed contract's bytecode cannot change
-- A certified Seed's identity and firmware integrity are
+- A compliant Seed's identity and firmware integrity are
   cryptographically verifiable to a remote party (once Layer 5 ships)
 
 **Interfaces above:**
 - Layers 2 and 3 read wallet identity and contract state via standard
   EVM/RPC calls
-- Layer 5 issues attestation challenges to certified Seed secure
+- Layer 5 issues attestation challenges to compliant Seed secure
   elements; receives signed reports
 
 ---
@@ -173,28 +173,34 @@ chain data can derive the wrapping key. The V4.1 deployment
 continues to serve its existing public-domain tokens under this
 construction.
 
-**Production access control (v2.4): threshold-mediated key release
-via Lit Protocol's Naga mainnet.** Master keys are random
-(32 bytes) at content preparation; encrypted-master-keys are
-wrapped to a Distributed Key Generation public key held by Lit
-Protocol's threshold network; release is gated by an Access
-Control Condition evaluated against current chain state
-(typically `balanceOf(:userAddress, :tokenId) > 0`). No party
-can release a key to a wallet that does not currently satisfy
-the condition. Transfers cause access to flow to the new holder
-automatically on the next decryption attempt. The Wylloh reference
-client and Seed daemon are migrating from the legacy construction
-to threshold-mediated release as the prerequisite for tokenizing
-any commercial content.
+**Production access control (v2.5): native threshold-mediated key
+release.** Master keys are random (32 bytes) at content preparation;
+the encrypted master key is wrapped to a Distributed Key Generation
+public key held by a threshold network; release is gated by an Access
+Control Condition evaluated against current chain state (typically
+`balanceOf(:userAddress, :tokenId) > 0`). No party can release a key
+to a wallet that does not currently satisfy the condition; transfers
+flow access to the new holder against current chain state. The
+threshold-release primitive is **substrate-independent** and the
+access layer is **native**: the Foundation's federated framework
+(Layer 5) operates and progressively decentralizes it, and the layer
+must not be rentable from, or revocable by, any party outside that
+framework. A mature external threshold network may serve only as a
+swappable interim bridge behind a stable interface, never as a
+dependency the protocol's guarantees rest on. This mechanism serves
+**open-tier** (no-hardware) content; commercial titles, and the
+flagship Seed-gated launch, use the **compliant tier's** per-device
+wrapping and binding model (§4.3).
 
-For the canonical specification of both, see whitepaper v2.4 §7.
+For the canonical specification of both, see whitepaper v2.5 §7.
 
-### 4.3 Certified-tier key wrapping (spec'd, not implemented)
+### 4.3 Compliant-tier key wrapping and binding (the day-1 commercial mechanism)
 
-For studio-licensed content and any title where forensic-grade
-attribution is required:
+For commercial titles — the tier the flagship Seed-gated launch is
+built on — and any content where endpoint protection or
+forensic-grade attribution is required:
 
-- **Per-device wrapping.** Content keys are wrapped to each certified
+- **Per-device wrapping.** Content keys are wrapped to each compliant
   Seed's public key, derived from its secure element. Each Seed gets
   a uniquely-wrapped instance of the key.
 - **Unwrap inside secure element.** Wrapped keys are decrypted only
@@ -203,9 +209,22 @@ attribution is required:
 - **Issuance gate.** Wrapped keys are issued by certification
   authorities only after the Seed presents a valid attestation
   report (Layer 5).
-- **Revocation.** Compromised certified devices can be added to a
+- **Revocation.** Compromised compliant devices can be added to a
   revocation registry (Layer 3); subsequent key issuance refuses
   the revoked device's attestation.
+- **Binding — one active copy.** A wrapped key is bound to one secure
+  element at a time; each token carries an on-chain `bound`/`released`
+  status. A bound copy plays offline indefinitely (the binding is
+  recorded, never re-verified). To transfer, the holder *releases*
+  (the device deletes its wrapped key; status → `released`); a
+  conforming marketplace settles only against a `released` token,
+  atomically with payment and royalty, so a buyer never acquires a
+  copy bound elsewhere. A lost device is recovered by owner-initiated
+  action after a heartbeat-timeout window; playback of already-bound
+  content fails open. This yields one-copy-per-token scarcity with no
+  continuous ownership check — enforcement only at binding and
+  release. Residual (a compromised device reporting `released` while
+  retaining its copy) is bounded and forensically watermarked (§4.4).
 
 ### 4.4 Watermarking (spec'd; provider TBD)
 
@@ -213,7 +232,7 @@ attribution is required:
   The storage API embeds a per-wallet watermark when serving the
   encrypted master key. Simple to implement; works for the trust
   model where the open-tier API is part of the trust boundary.
-- **Certified tier:** Seed-side watermarking inside the secure
+- **Compliant tier:** Seed-side watermarking inside the secure
   element at decryption time. Each playback inserts a per-wallet
   forensic watermark before the plaintext leaves the secure
   perimeter. Robust against transcoding requires commercial
@@ -230,10 +249,10 @@ articulation.
 
 **Two distinct sub-claims, with different defensibility:**
 
-1. **Per-device key wrapping (certified tier) — strong claim.**
-   Compromising one certified Seed yields *that Seed's local content
+1. **Per-device key wrapping (compliant tier) — strong claim.**
+   Compromising one compliant Seed yields *that Seed's local content
    only*. The network's aggregate exposure does not grow with network
-   size, because each certified device is its own isolated vault.
+   size, because each compliant device is its own isolated vault.
    This is the load-bearing security claim, and it scales positively
    with N.
 
@@ -246,7 +265,7 @@ articulation.
    combinatorial-cost argument applies but does not produce
    asymptotic security.
 
-The honest summary: *per-device key wrapping at the certified tier
+The honest summary: *per-device key wrapping at the compliant tier
 provides security that does not degrade with scale; threshold
 dispersal provides resilience and modestly raises extraction cost.*
 Both are valuable; only the first is the load-bearing claim.
@@ -294,7 +313,7 @@ Polygon mainnet, immutable, and verified.
   exhibition windows where time-bounded rights are staked rather
   than transferred.
 - **Revocation registry** (spec'd, not deployed). For invalidating
-  attestation credentials of compromised certified Seeds (Layer 5).
+  attestation credentials of compromised compliant Seeds (Layer 5).
 
 **Permissioning today (current V4.1 reality):**
 
@@ -360,7 +379,7 @@ shipping.
   coordination
 
 **Interfaces above:**
-- Layer 5 (attestation) gates which Seeds can serve certified-tier
+- Layer 5 (attestation) gates which Seeds can serve compliant-tier
   content
 - Layer 6 (application) consumes the LAN streaming protocol
 
@@ -389,13 +408,13 @@ attestation required. Anyone can implement an open-tier Seed and
 serve open-tier content. Third-party clients (community VLC plugin,
 custom mobile app, etc.) are welcome.
 
-### 7.2 Certified tier
+### 7.2 Compliant tier
 
 Seeds carrying hardware attestations from a federated certification
 authority. Required for studio-licensed content. Revocable. Audited.
 
 **Certification credential, technically:**
-- Each certified Seed holds a per-device keypair generated inside
+- Each compliant Seed holds a per-device keypair generated inside
   its secure element (Layer 0)
 - The certification authority signs a credential binding the device
   public key to a manifest of approved firmware measurements
@@ -422,9 +441,9 @@ authority. Required for studio-licensed content. Revocable. Audited.
 
 ### 7.3 Both tiers run the same protocol
 
-A user's library may contain both open-tier and certified-tier
+A user's library may contain both open-tier and compliant-tier
 titles. The client app sees a unified library; the only difference is
-that certified-tier titles will refuse to play on a non-certified
+that compliant-tier titles will refuse to play on a non-compliant
 Seed.
 
 Storefronts can sell into either tier. The protocol does not
@@ -462,7 +481,7 @@ permissionless at this layer: anyone can implement.
 - **Integrator deployment tooling** (future). Provisioning,
   attestation enrollment, multi-room configuration, residential AV
   integration (Crestron, Control4, Savant) — relevant to CEDIA-channel
-  deployment of certified Seeds.
+  deployment of compliant Seeds.
 
 **What this layer doesn't dictate:** UI/UX choices, branding,
 business model, monetization. Those are commercial choices made by
@@ -511,28 +530,28 @@ A few properties span multiple layers and deserve explicit treatment.
 Wallet identity (Layer 0) flows through every layer above it:
 - Layer 3 reads wallet for entitlement
 - Layer 4 reads wallet to gate Seed-to-Seed shard exchange (potentially)
-- Layer 5 ties certified-tier content key wrapping to user's wallet
+- Layer 5 ties compliant-tier content key wrapping to user's wallet
 - Layer 6 displays library based on wallet's token holdings
 
 This is intentional. The wallet is the single source of identity
 across the protocol. The wallet is never held by Seed hardware; phone-
 based wallets sign on the user's behalf.
 
-### 10.2 Open tier vs. certified tier separation runs through every layer
+### 10.2 Open tier vs. compliant tier separation runs through every layer
 
-| Layer | Open tier | Certified tier |
+| Layer | Open tier | Compliant tier |
 |---|---|---|
 | 0 | Wallet only | Wallet + secure-element-attested device |
 | 1 | Standard IPFS pinning | Same, plus per-device wrapped manifest |
 | 2 | Public-data-derived keys (permeable by design) | Per-device-wrapped keys, hardware-bound (per-N security) |
 | 3 | Same registries | Same registries plus revocation list |
-| 4 | Any Seed can serve | Only certified Seeds can serve |
+| 4 | Any Seed can serve | Only compliant Seeds can serve |
 | 5 | No attestation required | Hardware attestation required |
-| 6 | Any client app | LMAP-certified clients (or compatible ones) |
+| 6 | Any client app | LMAP-compliant clients (or compatible ones) |
 | 7 | Foundation governs spec | Foundation + CAs govern certification |
 
 A useful frame: *the open tier is the protocol's permissionless
-default; the certified tier is the optional add-on that enables
+default; the compliant tier is the optional add-on that enables
 studio relationships without compromising the default.*
 
 ### 10.3 Layer ownership is not vertical
@@ -556,7 +575,7 @@ prevents the layered abstraction from collapsing into a monolith.
 ```
 Layer 7 — Governance      ↑ (foundation, federation, voting)
 Layer 6 — Application     ↑ (storefronts, library UI, playback apps, integrator tools)
-Layer 5 — Attestation     ↑ (open tier / certified tier split)
+Layer 5 — Attestation     ↑ (open tier / compliant tier split)
 Layer 4 — Network         ↑ (Seed peer protocol, LAN streaming via HLS+mDNS)
 Layer 3 — Entitlement     ↑ (ERC-1155 distribution, ERC-721 copyright, royalties, staking)
 Layer 2 — Cryptography    ↑ (AES-256-GCM, two-tier keys, threshold dispersal, watermarking)

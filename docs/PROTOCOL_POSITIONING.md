@@ -205,7 +205,7 @@ shows demand.
 
 ---
 
-## 7. Two tiers, one protocol — open and certified
+## 7. Two tiers, one protocol — open and compliant
 
 The architectural answer to the open-protocol-vs-studio-trust tension
 lives at the *attestation layer*, not the *encryption layer*. Both
@@ -215,11 +215,12 @@ narrow.
 **Open tier.** Any Seed implementation that follows the spec serves
 content licensed under permissive terms — public domain, Creative
 Commons, indie creators who opt in. Encryption is AES-256-GCM with
-threshold-mediated key release via Lit Protocol's Naga mainnet (the
-production access-control mechanism in v2.4 onward; the earlier
-deterministic key-derivation construction is retired for production
-use and survives only for the V4.1 deployment of public-domain
-content). Under the legacy V4.1 construction, once a holder has the encrypted master key,
+threshold-mediated key release through a **native** access layer
+(substrate-independent, operated and progressively decentralized by
+the Foundation's federated framework — never rented from or revocable
+by an outside party; the earlier deterministic key-derivation
+construction is retired for production use and survives only for the
+V4.1 deployment of public-domain content). Under the legacy V4.1 construction, once a holder has the encrypted master key,
 decryption can happen forever, with or without any Wylloh-operated
 service. **This permeability is what makes the protocol genuinely
 platform-independent.** A developer with the public docs could write
@@ -227,11 +228,11 @@ a 50-line CLI that downloads and decrypts an LMAP-tokenized film without ever
 touching any Wylloh-operated server. That is a feature, not a
 weakness — it is the sovereignty commitment made concrete.
 
-**Certified tier.** Seeds carrying hardware attestations from a
+**Compliant tier.** Seeds carrying hardware attestations from a
 federated certification authority. Required for studio-licensed
 content. Revocable. Audited. Content keys are wrapped per-device,
 unwrappable only inside the Seed's secure element. Compromising one
-certified Seed yields *that Seed's local content only* — the
+compliant Seed yields *that Seed's local content only* — the
 network's aggregate exposure does not grow with N. This is the
 load-bearing security claim that makes credible studio engagement
 possible without breaking the protocol's openness.
@@ -241,11 +242,11 @@ content from both tiers under one unified interface. Storefronts can
 sell into either tier. Playback clients support both. The gating is
 narrow: hardware attestation for premium content keys.
 
-| Property | Open tier | Certified tier |
+| Property | Open tier | Compliant tier |
 |---|---|---|
 | Trust anchor | Wallet identity | Wallet + secure-element-attested device |
 | Encryption | AES-256-GCM + public-data key derivation | AES-256-GCM + per-device-wrapped keys |
-| Hardware required | None (any compliant Seed) | Certified Seed with secure element |
+| Hardware required | None (any compliant Seed) | Compliant Seed with secure element |
 | Content scope | Public domain, indie, Creative Commons | Studio-licensed (long-horizon) |
 | Implementation status | Shipped today | Spec'd; reference implementation in development |
 
@@ -258,7 +259,7 @@ what tokens a wallet can hold.
 The two-tier model is the layered story that lets LMAP start with
 permissive indie content (where the open tier is sufficient and
 aligns with the trust philosophy) and graduate to studio relationships
-(where certified-tier hardware attestation satisfies industry
+(where compliant-tier hardware attestation satisfies industry
 contractual norms) without touching the protocol or the token model.
 It is not a compromise of the sovereignty thesis — it is the
 sovereignty thesis surviving contact with industry reality.
@@ -317,7 +318,7 @@ or Ethereum a protocol distinct from any single Ethereum company.
   (reverse-osmosis through protocol / platform / community). This
   deserves its own doc (future `CURATION.md`).
 - **How filmmakers mint today.** Contact the founding team.
-- **Certified-tier content key issuance.** Once the certified tier
+- **Compliant-tier content key issuance.** Once the compliant tier
   ships, content key wrapping for studio-licensed material is gated
   by hardware attestation (Layer 5). The certification authority is
   LMF-only at v1, with a public commitment to federate
@@ -353,7 +354,7 @@ their own commercial terms):
   that comes from being first and being polished.
 - **Strategic investors** (broadcaster M&A arms, studio ventures,
   former-streamer founders as angels): the long-horizon ecosystem —
-  studios licensing into the certified tier, integrators deploying
+  studios licensing into the compliant tier, integrators deploying
   into luxury homes, third-party storefronts — only works because
   the protocol stays neutral.
 
@@ -431,7 +432,7 @@ protocol is the common layer. Everything else is a surface.
 
 *Last updated: 2026-04-28. Reframed §1 to clarify LMAP as the protocol
 (like DVD) and "liquid media" as the public category term;
-restructured §7 around the two-tier attestation model (open / certified)
+restructured §7 around the two-tier attestation model (open / compliant)
 that lives at Layer 5 of the layered architecture rather than the
 prior three-tier encryption framing; updated §8 to remove "open core"
 language in favor of "open protocol with reference implementations";
