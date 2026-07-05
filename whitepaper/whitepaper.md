@@ -406,10 +406,13 @@ conforming marketplace settles a sale only against a `released`
 token, atomically with payment and royalty, so a buyer can never
 acquire a copy that is still bound elsewhere; a raw token transfer
 outside a conforming marketplace is caveat emptor, and wallets warn
-on a `bound` token. If a bound device is lost or destroyed, playback
+on a `bound` token. If a bound device is lost, sold, or destroyed, playback
 of its already-bound content is unaffected (it fails open) and the
-token's transferability is recovered by the owner after a
-heartbeat-timeout window — owner-initiated, never automatic. This
+token's transferability is recovered by an owner-signed **report**
+that releases the titles after a 30-day window — **no heartbeat or
+presence beacon**; the device verifiably erases the released titles
+as a precondition of its next transaction, and a refusing device is
+revoked. This
 restores one-copy-per-token scarcity, and with it collectible and
 resale value, without any continuous ownership check: enforcement
 occurs only at the discrete moments of binding and release. The
@@ -897,7 +900,15 @@ maintained primarily for monetization through inferred consumer
 preferences. The protocol model maintains pseudonymous wallets
 executing public transactions on a transparent ledger, with no link
 to real-world identity, no telemetry from playback events, and no
-viewing patterns aggregated by any party. Creators receive
+viewing patterns aggregated by any party. This holds in the compliant
+tier as well: a bound player contacts the network only at
+owner-initiated transactions (register, bind, release, report),
+never with an ambient presence signal, so recovery is
+report-triggered rather than surveillance-detected. The issuer learns
+*acquisition* events — which on-chain ownership already largely
+reveals — but never *when* or *how often* a holder watches;
+oblivious issuance, in which the issuer does not learn the title, is
+a specified future privacy enhancement. Creators receive
 aggregate insights — token distribution by region inferred from
 public data, secondary-market activity, holder concentration —
 without compromising individual privacy.
@@ -1247,8 +1258,9 @@ compliant tier (§7.2).** Per-device wrapping now carries an on-chain
 time, plays offline indefinitely, and must be *released* — the device
 deletes its wrapped key — before its token can be transferred; a
 conforming marketplace settles only against a released token,
-atomically with payment and royalty, and a heartbeat-timeout,
-owner-initiated recovery covers lost devices. This restores
+atomically with payment and royalty, and an owner-signed report
+releases a lost device's titles after a 30-day window (no presence
+beacon), with transaction-gated erasure. This restores
 one-copy-per-token scarcity, and with it collectible and resale
 value, without any continuous ownership check — resolving the
 sovereignty-versus-scarcity tension in favor of both. Companion

@@ -219,9 +219,12 @@ forensic-grade attribution is required:
   (the device deletes its wrapped key; status → `released`); a
   conforming marketplace settles only against a `released` token,
   atomically with payment and royalty, so a buyer never acquires a
-  copy bound elsewhere. A lost device is recovered by owner-initiated
-  action after a heartbeat-timeout window; playback of already-bound
-  content fails open. This yields one-copy-per-token scarcity with no
+  copy bound elsewhere. A lost, sold, or broken device is recovered
+  by an owner-signed **report** that releases its titles after a
+  30-day window (no heartbeat or presence beacon); the device
+  verifiably erases them as a precondition of its next transaction,
+  and a refusing device is revoked. Playback of already-bound content
+  fails open. This yields one-copy-per-token scarcity with no
   continuous ownership check — enforcement only at binding and
   release. Residual (a compromised device reporting `released` while
   retaining its copy) is bounded and forensically watermarked (§4.4).
