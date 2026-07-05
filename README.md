@@ -15,13 +15,20 @@ physical-grade ownership in liquid digital form.
 
 ---
 
-## Status (May 2026)
+## Status (July 2026)
 
 LMAP Specification v1.0 is in drafting. The reference contract for
 v1.0 (`LMAPRegistryV5`) is in development under foundation
 governance. A legacy registry (`WyllohRegistryProtocolV4_1`) is
 deployed on Polygon mainnet today and serves as the open-tier
 reference deployment until V5 ships.
+
+Access to decryption is native to the protocol and gated by current
+on-chain ownership. Permissive content uses no-hardware threshold
+release (the **open tier**); commercial content binds one active
+copy to a sealed, conformant player (the **compliant tier**), which
+adds endpoint protection without a rented key service. See the
+whitepaper for the full model.
 
 | Component | Status |
 |---|---|
@@ -30,7 +37,7 @@ reference deployment until V5 ships.
 | Paired copyright registry `LMAPCopyrightRegistryV1` | Specified |
 | Legacy `WyllohRegistryProtocolV4_1` (open-tier compatible) | Shipped, immutable, on Polygon mainnet |
 | Node.js reference client (Seed daemon) | Operational in the Wylloh reference implementation; extraction to this repo planned |
-| Whitepaper | v2.3 published (May 2026) — see [`whitepaper/`](./whitepaper/) |
+| Whitepaper | **v2.5** (July 2026) — [read the PDF](./whitepaper/whitepaper.pdf) or [Markdown source](./whitepaper/whitepaper.md) |
 
 ---
 
@@ -65,7 +72,7 @@ lmap/
 LMAP is stewarded by the Liquid Media Foundation, an independent
 non-profit (in formation, structured as a 501(c)(6) trade
 association). The Foundation holds the LMAP specification under an
-open license, governs the certified-tier attestation framework,
+open license, governs the compliant-tier attestation framework,
 and publishes companion specifications for additional media types
 as those communities develop.
 
