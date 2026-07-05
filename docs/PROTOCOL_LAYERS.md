@@ -148,8 +148,12 @@ load-bearing security layer.
 - **Chunked format** (open tier v1): `[Len(4b BE)][IV(12b)][Ciphertext+Tag(16b)]`
   per 4 MiB chunk. Self-authenticating per chunk; supports streaming
   decryption with constant memory.
-- **Per-title content keys** derived via HKDF with domain separation;
-  no key reuse across titles.
+- **Per-title master keys are independently random** (no catalog-wide
+  master); per-asset and per-rendition subkeys are HKDF-derived from
+  the title master with domain separation. No key reuse across titles
+  or assets. Multi-tier titles key each rights tier independently,
+  released under that tier's access condition (`balanceOf ≥
+  threshold_T`), so a lower tier never derives a higher one.
 
 Specified in `client-v2/src/services/encryption.ts` and ported to
 Seed firmware. Spec is open; any compliant client can implement.

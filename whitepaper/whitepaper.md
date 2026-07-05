@@ -365,9 +365,16 @@ Reference hardware for the compliant tier includes ARM
 TrustZone [^12]-capable SoCs with discrete secure elements (e.g.,
 NXP SE050 or equivalent), or platforms with TPM 2.0 [^4] support.
 Remote attestation [^5] follows established patterns from
-contemporary trusted-computing literature. Per-title content keys
-are derived from a master with HKDF-style domain-separated key
-derivation [^11] to prevent key reuse across titles.
+contemporary trusted-computing literature. The key hierarchy is precise: each title has an **independently
+random** master key — there is no catalog-wide master (that would be
+the class break §7.4 relies on not existing). Within a title, HKDF
+with domain separation [^11] derives per-asset and per-rendition
+subkeys, so keys are never reused across assets or titles. Where a
+title carries multiple **rights tiers** (§4), each tier's asset is
+keyed and protected *independently*, under its own access condition
+(`balanceOf(:userAddress, :tokenId) ≥ threshold_T`), such that
+obtaining a lower tier's key never derives a higher tier's; the exact
+construction is fixed in the forthcoming technical specification.
 
 **Hardware binding is a normative requirement of the compliant tier.**
 A compliant compliant-tier implementation MUST use a hardware secure
