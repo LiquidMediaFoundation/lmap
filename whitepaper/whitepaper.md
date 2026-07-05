@@ -455,32 +455,47 @@ have legitimately decrypted it. That is the analog hole and the
 post-decryption copy. Threshold release does not address those
 threats — and we do not claim that it does.
 
-**Compliant tier (hardware-attested per-device key wrapping).** This
-is *endpoint protection*. Hardware-attested DRM (Widevine L1,
-PlayReady, FairPlay, and LMAP's compliant tier) constrains what
-the device can do with the decrypted stream during playback,
-*against the device's own owner*. The decryption happens inside a
-hardware secure element; the plaintext key never appears in main
-memory or persistent storage; playback paths are constrained
-(secure video output, attested HDMI HDCP, no framebuffer access)
-to prevent the device from extracting plaintext after legitimate
-decryption. This is what studios require for premium content, and
-they require it for a reason that threshold release does not
-address: their threat model includes the legitimate viewer
-attempting to capture.
+**Compliant tier (attested per-device key wrapping — the binding
+model).** This adds *endpoint protection* on top of ownership-gated
+access, and is the mechanism the flagship launch is built on (§7.2).
+Both are provided together by binding: the issuer verifies current
+ownership and the device's attestation, then wraps the master key to
+the device's secure element. Crucially, the compliant player is a
+**sealed direct player** that renders and outputs video itself
+(§9) — the decrypted stream is confined to a protected media path to
+the player's *own* HDCP-protected output and is never streamed in the
+clear to a separate device. Key custody and attestation live in a
+hardware secure element; the bulk media decrypt runs in a protected
+media pipeline (a TEE) inside the same sealed perimeter, so the raw
+key and decoded frames never leave that perimeter. This constrains
+what the device does with the stream *against the device's own
+owner* — what licensing contracts for premium content require.
 
-**These are not equivalent.** They solve different threat models:
-threshold release gates *who gets the key*; hardware DRM gates
-*what the device does with the key*. The two tiers compose well —
-the compliant tier in LMAP runs threshold release at the access
-layer and adds per-device hardware wrapping at the playback layer
-— but the two layers are not substitutes for one another. The
-protocol claims threshold release at the open tier is honest and
-sufficient for indie, public-domain, Creative Commons, and
-creator-opt-in content, where extraction at the playback edge is
-acceptable defense rested on social incentive plus watermarking.
-For content where licensing contracts demand endpoint protection,
-the compliant tier provides it.
+**On parity with commercial DRM — stated carefully.** Hardware-
+attested endpoint protection is the category that also includes
+Widevine L1, PlayReady, and FairPlay. LMAP's compliant tier belongs
+to that category by construction, but the protocol does **not** claim
+measured robustness *parity* with those specific systems, which rest
+on SoC-integrated secure-video paths, protected memory, and certified
+provisioning refined over many years. Parity is a property to be
+*earned* through a published robustness specification and independent
+review (a forthcoming LMAP V6 deliverable, §7.2), not asserted. Until
+then the honest claim is narrower and still substantial: a sealed
+direct player with a hardware secure element, a protected media path,
+and attested output — materially stronger than software-only access
+control, and scoped to the independent and boutique premium content
+the launch serves.
+
+**These are not equivalent [access vs. endpoint].** They solve
+different threat models: threshold release gates *who gets the key*;
+the compliant tier's sealed player additionally gates *what the
+device does with the key*. They are not substitutes. Threshold
+release at the open tier is honest and sufficient for indie,
+public-domain, Creative Commons, and creator-opt-in content, where
+extraction at the playback edge is acceptable defense resting on
+social incentive plus watermarking. For content whose licensing
+demands endpoint protection, the compliant tier — a sealed direct
+player — provides it.
 
 **A modest supplementary claim — threshold dispersal of ciphertext
 (storage layer).** Sharding ciphertext across Seeds raises the
@@ -513,16 +528,18 @@ storage are shipped on Polygon mainnet via the V4.1 registry.
 *The Cocoanuts* (1929, public domain) was tokenized and decrypted
 end-to-end across two independent architectures (macOS arm64,
 Raspberry Pi aarch64) using the legacy deterministic key-derivation
-construction. **Native threshold-mediated key release is the new production
-access-control mechanism** and
-is in active migration in the Wylloh reference implementation; the
-migration must complete before any commercial title is tokenized
-on the protocol, and is the highest-priority near-term engineering
-milestone. Compliant tier (per-device key wrapping, hardware
-attestation, federated issuers) is specified at the protocol level
-with hardware-binding declared normative (§7.2); the wire-level
-attestation specification, the framework's first issuer, governance
-process, and operational maturity are forthcoming.
+construction. The **compliant tier** — attested per-device binding on the sealed
+direct player (§7.2) — is the launch access-control mechanism for
+commercial content, consistent with a Seed-gated first release. Its
+wire-level attestation specification, conformance suite, and the
+Foundation's first (single) issuer are the highest-priority near-term
+deliverables of the launch build; hardware binding is declared
+normative (§7.2). **Native threshold-mediated key release** serves the
+open (no-hardware) tier and is in active migration off the retired
+deterministic construction in the Wylloh reference implementation; the
+native, fully-decentralized threshold network — and the
+decentralization of the compliant-tier issuer from single → federated
+→ threshold — is the longer-horizon endgame (§7.3).
 
 ## 8. Permanence Guarantees {-}
 
@@ -593,21 +610,26 @@ which has no equivalent recovery path when a disc fails.
 
 Content distribution operates through *Seeds* — user-operated nodes
 that combine encrypted-content storage, peer-to-peer participation,
-and a local LAN-streaming service for playback applications. Seeds
-run on commodity hardware following published reference designs.
+and playback. Seeds run on commodity hardware following published
+reference designs.
 
-A Seed is a headless device. It does not connect directly to a
-television; instead, it serves LMAP-registered content to client
-applications running on platforms users already own — Roku, Apple
-TV, iOS, the web. The user's existing remote, the user's existing
-television, the user's existing input habits all remain intact. The
-Seed becomes infrastructure: quiet, reliable, operated as a piece of
-furniture in the home network rather than a screen in the living
-room. Earlier protocol designs envisioned the Seed as a custom-UI
-device that attached directly to a television; experience has shown
-that a headless server paired with thin client applications on
-existing platforms is simpler, more accessible, and less subject to
-the obsolescence that affects custom television-UI hardware.
+A Seed is a **sealed direct player**: it connects to the television
+and renders and outputs video itself, so that compliant-tier content
+is decrypted and displayed entirely within one sealed device — the
+only place endpoint protection (§7.4) is coherent. Decryption happens
+inside the player's secure element and protected media path, and
+plaintext never crosses the network. The reference design is a
+fanless, small-form-factor player with a custom case and CEC so the
+television's own remote drives it. Earlier designs explored a
+*headless* Seed that served decrypted video to thin clients (Roku,
+Apple TV, iOS) on the home network; that model reaches devices users
+already own but forfeits endpoint protection at the client hop, so it
+is retained only as a **secondary mode for open-tier content** —
+never the path for compliant-tier premium content, which plays on the
+sealed player alone. (Streaming to a personal device from one's
+*own* Seed is a convenience feature layered on the same footing:
+available for open-tier content, out of scope for the compliant
+tier's guarantees.)
 
 Each Seed stores content its operator owns, plus optionally
 contributes overflow capacity to the network. Popular films
@@ -1048,14 +1070,14 @@ addressable audience by separating the protocol from any particular
 hardware vendor and accepting standard 4K HDR streaming quality
 rather than requiring lossless masters.
 
-**Plex** demonstrates the "headless server at home plus client app
-on the television" architecture at scale (over 25 million users)
-with primarily user-ripped content of unclear provenance. LMAP-
-compatible Seed devices inherit this architecture and address
-Plex's structural limitations: no provenance, no royalty flow, no
-curatorial focus, closed-source business model. The reference Seed
-device extends Plex's pattern with on-chain provenance and an open
-protocol.
+**Plex** demonstrates local, home-owned media at scale (over 25
+million users), but with primarily user-ripped content of unclear
+provenance, no rights or royalty flow, no curatorial focus, and a
+closed-source business model. The Seed shares Plex's core virtue —
+your library lives at home, not in a rented cloud — while differing
+in form (a sealed direct player, not a headless server feeding
+third-party clients) and in substance: on-chain provenance,
+automatic royalties, and an open protocol anyone can implement.
 
 **Filecoin** [^7] **and Helium** demonstrate decentralized-network
 plays with token-incentive mechanisms. Both attracted speculative
@@ -1171,18 +1193,23 @@ of this paper's publication:
   passing tests; full marketplace implementation, comprehensive
   test coverage, and deployment under foundation governance are
   2026 milestones.
-- **Specified, in implementation (hardware and clients):** reference
-  Seed device (the *Origin*); native client applications for Roku,
-  Apple TV, and iOS.
+- **Specified, in implementation (hardware, clients, and the
+  compliant tier):** the reference Seed device (the *Origin*), a
+  sealed direct player; its native client applications for open-tier
+  LAN streaming (Roku, Apple TV, iOS); and the **compliant-tier launch
+  mechanism** — attested per-device binding (§7.2) with a single
+  Foundation issuer. The wire-level attestation specification (report
+  format, credential schema, revocation flow), the conformance suite,
+  and the binding and marketplace-settlement flow are launch
+  deliverables in active specification.
 - **Specified, future protocol versions (V6+):** ERC-721 copyright
   registry; on-chain staking for commercial-exhibition windows;
-  presale-funding milestone-escrow contracts; threshold dispersal
-  of ciphertext shards; compliant-tier attestation framework with
-  federated issuers and **normatively-required hardware-attested
-  per-device key wrapping** (§7.2). The wire-level attestation
-  specification (report format, credential schema, issuer federation
-  protocol, revocation flow) is committed to a separate LMAP V6
-  technical specification, forthcoming.
+  presale-funding milestone-escrow contracts; threshold dispersal of
+  ciphertext shards; **federation of the attestation issuer and
+  decentralization of the compliant-tier key service from single →
+  federated → threshold** (§7.3); and the on-chain binding registry
+  and transfer-hook enforcement that succeed the launch's issuer-gated
+  binding (§7.2).
 - **Long-horizon (operational maturity required):** studio-grade
   compliant-tier engagement with major rights holders.
 
@@ -1217,8 +1244,8 @@ owner-initiated recovery covers lost devices. This restores
 one-copy-per-token scarcity, and with it collectible and resale
 value, without any continuous ownership check — resolving the
 sovereignty-versus-scarcity tension in favor of both. Companion
-documents (`PROTOCOL_LAYERS.md`, `PROTOCOL_POSITIONING.md`) are
-updated in step.
+documents (`PROTOCOL_LAYERS.md`, `PROTOCOL_POSITIONING.md`) are being
+brought into alignment (a multi-pass rework in progress).
 
 **Version 2.4 (June 2026).** Supersedes v3.0 (also June 2026)
 following external architectural review. v3.0 attempted to add an

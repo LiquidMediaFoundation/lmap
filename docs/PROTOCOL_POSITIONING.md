@@ -88,8 +88,12 @@ the relationship. LMAP tries to do neither.
 
 **What this means in practice:**
 
-- **Lenient on downloads.** Token holders can download as many times
-  as they want, to as many devices as they want. Unmetered. Trustless.
+- **Lenient on downloads (open tier).** Open-tier content can be
+  downloaded as many times as you want, to as many devices as you
+  want — unmetered, trustless. Compliant-tier content instead *binds*
+  one active copy per unit owned: you can hold as many copies as
+  units and move or sell any of them, but a given unit plays on one
+  device at a time. Two honest models for two kinds of content.
 - **Honest about each edge.** The browser leaves a plaintext file; the
   Seed does not. Users can pick the edge that fits their values.
 - **Strict where it's the premium.** The Seed is the sovereignty
@@ -119,8 +123,12 @@ every marketplace built on LMAP. The protocol treasury — ultimately
 governed by token holders, currently stewarded by the founding team —
 is the recipient.
 
-**Filmmakers keep 97.5% of every sale, regardless of which
-marketplace the sale happens through.**
+**Of every sale, 97.5% goes to the rights holder — regardless of
+which marketplace the sale happens through** (the protocol takes only
+2.5%). A self-publishing filmmaker keeps the full 97.5%; where a
+publisher is involved, that 97.5% splits between publisher and author
+on terms they set (whitepaper §10.1). It never leaves the people who
+made and released the film for a platform.
 
 ---
 
@@ -160,23 +168,27 @@ and how hard extraction is.
 | Client | Download | At rest | Extraction resistance |
 |---|---|---|---|
 | **wylloh.com (browser)** | Encrypted → streaming decrypt in memory → plaintext MP4 to Downloads folder | Plaintext | None, by design |
-| **Wylloh Seed** (headless home server) | Encrypted → stays encrypted on SSD → streaming decrypt to LAN client | Encrypted, hardware-bound | Strong |
-| **Wylloh Roku / Apple TV / iOS app** | Streams from a paired Seed over LAN | No persistent local copy | Inherits Seed's resistance |
+| **Wylloh Seed** (sealed direct player) | Encrypted → decrypts inside the sealed player → displayed on its own output | Encrypted, hardware-bound | Strong (compliant tier) |
+| **Wylloh Roku / Apple TV / iOS app** | Open-tier LAN streaming from a paired Seed; phone-as-remote | No persistent local copy | Open-tier only (not the compliant path) |
 | **Third-party clients** | Client's choice | Client's choice | Client's choice |
 
 Each serves a different use case:
 
 - The **browser** is the onboarding surface. Zero install. Plaintext
   output. This is where new users meet LMAP. We do not fight them.
-- The **Seed** is the sovereignty tier — a headless home server
-  paired with branded client apps on the TV platforms users already
-  own. Extraction-resistant by design. For collectors who want a
-  physical-media feel without the DIY friction of Plex.
+- The **Seed** is the sovereignty tier — a sealed **direct player**
+  that decrypts and displays compliant-tier content within one
+  device. Extraction-resistant by design. For collectors who want a
+  physical-media feel without the DIY friction of Plex. (Its
+  companion apps on Roku / Apple TV / iOS serve *open-tier* LAN
+  streaming to other rooms and phone-as-remote; compliant-tier
+  premium content plays on the sealed player alone.)
 - **Third-party clients** are welcome. They inherit the protocol,
   make their own UX choices, pay the same 2.5% fee.
 
-See `docs/seed-one/ARCHITECTURE.md` for the V2 Seed architecture
-(headless server + client apps on Roku/Apple TV/iOS).
+See `docs/seed-one/ARCHITECTURE.md` for the Seed architecture (sealed
+direct player; companion client apps serve open-tier LAN streaming
+and phone-as-remote).
 
 ---
 
@@ -425,7 +437,7 @@ protocol is the common layer. Everything else is a surface.
 
 ---
 
-*Last updated: 2026-04-28. Reframed §1 to clarify LMAP as the protocol
+*Last updated: 2026-07-05 (aligning to whitepaper v2.5: direct-player, compliant tier, binding model — rework in progress). Reframed §1 to clarify LMAP as the protocol
 (like DVD) and "liquid media" as the public category term;
 restructured §7 around the two-tier attestation model (open / compliant)
 that lives at Layer 5 of the layered architecture rather than the

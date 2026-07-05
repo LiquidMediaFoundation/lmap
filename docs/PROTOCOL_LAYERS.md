@@ -359,9 +359,12 @@ shipping.
   serve high-quality shards earn higher discovery priority. Seeds
   that serve corrupted or partial shards are deprioritized.
 
-**LAN streaming protocol** (spec'd):
+**LAN streaming protocol** (spec'd, open tier). Compliant-tier content
+plays on the sealed direct player itself (Layer 5); LAN streaming to
+companion apps and personal devices is an **open-tier** capability
+that trades endpoint protection for reach:
 
-- **HLS over HTTPS** as the primary client-Seed protocol
+- **HLS over HTTPS** as the open-tier client-Seed protocol
 - mDNS / Bonjour for Seed discovery on the LAN
 - TLS with self-signed cert pinned at pairing time
 - Roku, Apple TV, iOS/iPadOS, and web browsers all natively support
@@ -374,7 +377,8 @@ shipping.
 **What this layer guarantees:**
 - Seeds can find content available on the network without central
   coordination
-- A Seed serves content to client apps over the LAN as standard HLS
+- A Seed serves *open-tier* content to companion client apps over the
+  LAN as standard HLS; compliant-tier playback stays on the direct player
 - Compromised peers can be deprioritized without protocol-level
   coordination
 
@@ -611,5 +615,5 @@ Decisions worth converging on:
 
 ---
 
-*Last updated: 2026-04-28. Living document. Expect refinement as
+*Last updated: 2026-07-05 (aligning to whitepaper v2.5: native access layer, compliant-tier rename, direct-player, binding model — rework in progress). Living document. Expect refinement as
 each layer matures from spec to implementation.*
