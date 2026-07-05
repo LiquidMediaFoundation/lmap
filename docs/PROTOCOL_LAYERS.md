@@ -233,21 +233,37 @@ forensic-grade attribution is required:
   release. Residual (a compromised device reporting `released` while
   retaining its copy) is bounded and forensically watermarked (§4.4).
 
-### 4.4 Watermarking (spec'd; provider TBD)
+### 4.4 Watermarking (scheme and provider open — dependent claims are conditional)
 
-- **Open tier:** server-side watermarking before download fulfillment.
-  The storage API embeds a per-wallet watermark when serving the
-  encrypted master key. Simple to implement; works for the trust
-  model where the open-tier API is part of the trust boundary.
-- **Compliant tier:** Seed-side watermarking inside the secure
-  element at decryption time. Each playback inserts a per-wallet
-  forensic watermark before the plaintext leaves the secure
-  perimeter. Robust against transcoding requires commercial
-  watermarking IP — engagement with Verimatrix, NAGRA, or Irdeto is
-  the path to studio-grade implementation.
-- **Insertion-point invariant:** wherever watermarking happens, the
-  wallet identity is bound to the content before any plaintext bit
-  reaches a copy-able surface.
+Forensic watermarking is the designated backstop for several residual
+claims elsewhere (the compliant tier's post-decryption leak; the
+recovery residual, §4.3). Its locus differs by tier and its robustness
+is not yet established, so **claims that lean on watermark attribution
+("bounded", "traceable") are conditional on integrating a scheme with
+measured robustness — not asserted as already delivered.**
+
+- **Compliant tier:** watermarking inserts in the **protected media
+  path** (the TEE media pipeline, whitepaper §7.2), at decode time,
+  before any frame reaches an output — *not* in the discrete secure
+  element, which holds keys and cannot bus or decode video. Each
+  playback binds the holder's identity to the frames within the sealed
+  perimeter. Transcoding-robust marking requires commercial IP
+  (Verimatrix, NAGRA, Irdeto); until such a scheme is integrated and
+  independently measured, the attribution claim is *conditional*.
+- **Open tier:** per-user marking collides with content addressing —
+  per-wallet bytes mean per-wallet CIDs, which breaks Layer 1's
+  byte-identical-CID guarantee and the shared-swarm distribution
+  thesis, and reintroduces a per-download central serving path;
+  client-side insertion is unenforceable in a tier that welcomes
+  arbitrary third-party clients. The open tier therefore does **not**
+  rest its defense on watermarking: it accepts playback-edge
+  permeability by design (§4.5, whitepaper §7.4) and relies on social
+  incentive, easy legitimate purchase, and creator alignment. A
+  content-addressing-compatible open-tier mark (e.g. segment-level
+  side-channel marks) is an open research item, not a v1 dependency.
+- **Insertion-point invariant (where marking is used):** the holder's
+  identity is bound to the content before any plaintext bit reaches a
+  copy-able surface.
 
 ### 4.5 The "security scales with N" thesis — what's actually claimed
 
@@ -623,6 +639,39 @@ Decisions worth converging on:
 7. **DKG ceremony for early threshold key generation.** Centralized
    at v1 (single trusted setup) vs. distributed from day one (more
    complex, more credible).
+
+---
+
+## Glossary (disambiguating overloaded terms)
+
+The 2026 "certified → compliant" rename introduced two collisions; this
+glossary is the source of truth, and a follow-up pass will apply it
+throughout (prefer *conformant* for the generic sense).
+
+- **Conformant** — *any* implementation that follows the LMAP spec: a
+  conformant Seed, client, or marketplace. This is the generic sense
+  ("any implementation may participate"). Prefer this word over the
+  generic use of "compliant."
+- **Compliant tier** — the specific access tier requiring hardware-
+  attested per-device binding on a sealed direct player. A "compliant
+  device" is a device that meets *this tier's* hardware conformance
+  spec (§3 of the device doc), not merely a spec-following device.
+- **Credential issuer (attestation authority)** — verifies a device's
+  hardware integrity and signs its attestation credential (a CA-like
+  role; whitepaper §7.3).
+- **Key issuer (key service)** — wraps content keys to attested,
+  currently-entitled devices and maintains `boundCount` (binding
+  state). Distinct role from the credential issuer, though the
+  Foundation may operate both during bootstrap. Where older text says
+  keys are "issued by certification authorities," read *key issuer*.
+- **Direct player** — a sealed compliant device with its own video
+  output; the launch playback device. **Companion client** — an
+  open-tier app on a third-party platform (Roku/Apple TV/iOS), for LAN
+  streaming and phone-as-remote, outside the compliant-tier perimeter.
+- **Bind / release / `boundCount` / `transferable`** — a copy *binds*
+  to one device (increments the wallet's `boundCount` for that
+  tokenId); *release* deletes it and decrements; `transferable =
+  balance − boundCount`. See the device doc §2.
 
 ---
 

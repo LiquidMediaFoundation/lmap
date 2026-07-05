@@ -117,11 +117,15 @@ matters.
   redundancy on IPFS, contract auditing, security work, open-source
   development, the costs of keeping the network resilient.
 
-The 2.5% is hardcoded in the smart contract. It cannot be raised, and
-it cannot be waived per-sale. It is stable, legible, and the same for
-every marketplace built on LMAP. The protocol treasury — ultimately
-governed by token holders, currently stewarded by the founding team —
-is the recipient.
+The 2.5% is stable, legible, and the same for every marketplace built
+on LMAP, and cannot be waived per-sale. Protocol parameters are not
+unilaterally alterable: any change occurs only through the
+Foundation's governance, via a public multi-sig timelock — never by a
+single operator and never per-sale. The protocol treasury is governed
+by the **Liquid Media Foundation** — an independent foundation with an
+independent-majority board, *not* a protocol-token holder vote (v2.4
+removed the token concept) — bootstrapped by the founding team and
+federating to that board over time.
 
 **Of every sale, 97.5% goes to the rights holder — regardless of
 which marketplace the sale happens through** (the protocol takes only
@@ -234,11 +238,16 @@ by an outside party; the earlier deterministic key-derivation
 construction is retired for production use and survives only for the
 V4.1 deployment of public-domain content). Under the legacy V4.1 construction, once a holder has the encrypted master key,
 decryption can happen forever, with or without any Wylloh-operated
-service. **This permeability is what makes the protocol genuinely
-platform-independent.** A developer with the public docs could write
-a 50-line CLI that downloads and decrypts an LMAP-tokenized film without ever
-touching any Wylloh-operated server. That is a feature, not a
-weakness — it is the sovereignty commitment made concrete.
+service. **This particular permeability is a property of the legacy
+demonstration construction, not the production protocol.** A developer
+with the public docs could write a 50-line CLI that downloads and
+decrypts a *legacy public-domain* LMAP title without touching any
+Wylloh server — a concrete proof of the open spec. Production content
+(threshold-released open tier, or compliant-tier binding) needs a
+network round-trip to obtain a key; the protocol's platform-
+independence rests not on that permeability but on its open
+specification, on-chain ownership, and permissionless implementations
+— no single company's servers in the path.
 
 **Compliant tier.** Seeds carrying hardware attestations from a
 federated certification authority. Required for studio-licensed
@@ -265,11 +274,15 @@ narrow: hardware attestation for premium content keys.
 | Content scope | Public domain, indie, Creative Commons | Studio-licensed (long-horizon) |
 | Implementation status | Shipped today | Spec'd; reference implementation in development |
 
-**The critical invariant: the ownership token never changes.** Under
-both tiers, the token remains transferable, provably owned on-chain,
-and executable off-platform. The token *is* the license. The
-attestation tier governs what bytes a particular Seed can serve, not
-what tokens a wallet can hold.
+**The critical invariant: the ownership token is always yours to
+move.** The token is provably owned on-chain and is the license
+itself. In the compliant tier, binding adds one honest step — a bound
+unit is *released* (its copy erased) before it transfers, so
+`transferable = balance − boundCount` — but the token is never
+trapped: a holder can always release and move it. Attestation governs
+what a device may do with decrypted frames, and binding governs how
+many live copies a wallet runs at once; neither can prevent a wallet
+from *holding* or *transferring* the token it owns.
 
 The two-tier model is the layered story that lets LMAP start with
 permissive indie content (where the open tier is sufficient and
@@ -430,7 +443,7 @@ protocol is the common layer. Everything else is a surface.
 > physical-grade ownership in liquid digital form. The token is the
 > license. The bytes are just bytes. Anyone can build a storefront
 > on it, anyone can build a player, anyone can build hardware — and
-> filmmakers keep 97.5% of every sale, so independent film can stay
+> the rights holder keeps 97.5% of every sale, so independent film can stay
 > sustainable. The 2.5% protocol fee funds shared infrastructure,
 > not marketplace rent.
 >
