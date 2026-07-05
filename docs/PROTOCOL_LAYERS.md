@@ -251,8 +251,12 @@ articulation.
 
 1. **Per-device key wrapping (compliant tier) — strong claim.**
    Compromising one compliant Seed yields *that Seed's local content
-   only*. The network's aggregate exposure does not grow with network
-   size, because each compliant device is its own isolated vault.
+   only* — a constant per-compromise bound, with no master secret
+   whose theft unlocks the catalog. Stated precisely: the
+   *per-compromise yield* does not grow with network size; the
+   probability that *some* holder of a given title is compromised does
+   grow with holder count, and that residual is bounded by watermark
+   attribution and revocation, not by cryptography.
    This is the load-bearing security claim, and it scales positively
    with N.
 

@@ -244,10 +244,13 @@ weakness — it is the sovereignty commitment made concrete.
 federated certification authority. Required for studio-licensed
 content. Revocable. Audited. Content keys are wrapped per-device,
 unwrappable only inside the Seed's secure element. Compromising one
-compliant Seed yields *that Seed's local content only* — the
-network's aggregate exposure does not grow with N. This is the
-load-bearing security claim that makes credible studio engagement
-possible without breaking the protocol's openness.
+compliant Seed yields *that Seed's local content only* — a constant
+per-compromise bound, with no catalog-scale master secret. (Per-title
+leak probability still grows with holder count; that residual is
+bounded by watermark attribution and revocation, not cryptography —
+see whitepaper §7.4.) This is the load-bearing security claim that
+makes credible studio engagement possible without breaking the
+protocol's openness.
 
 **Both tiers run the same protocol.** A user's library aggregates
 content from both tiers under one unified interface. Storefronts can

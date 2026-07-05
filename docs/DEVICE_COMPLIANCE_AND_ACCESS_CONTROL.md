@@ -114,7 +114,7 @@ Consistent with whitepaper §8: a **bound** copy plays **forever, offline**, reg
 
 ## 7. Threat model & honesty boundary
 
-**Protects:** keys released only to *current* owners; keys never in plaintext at rest; decryption confined to the secure perimeter; **per-device wrapping means compromising one device yields only that device's local content — exposure does not grow with N** (`PROTOCOL_LAYERS.md` §4.5, the load-bearing claim).
+**Protects:** keys released only to *current* owners; keys never in plaintext at rest; decryption confined to the secure perimeter; and **per-device wrapping eliminates catalog-scale compromise** — there is no master secret whose theft unlocks the catalog, and compromising one device yields only *that* device's local content, a constant per-compromise bound (`PROTOCOL_LAYERS.md` §4.5). Stated precisely, so it is not overclaimed: the *per-compromise yield* is constant and attributable; the probability that *at least one* of a title's holders' devices is ever compromised still grows with holder count. That residual is bounded by **watermark attribution and revocation, not by cryptography** — the honest scope of "per-N security."
 
 **Does not (stated honestly, never overclaimed):**
 - Eliminate the **analog hole** (camera-at-screen). Watermarking mitigates; robustness is an arms race.

@@ -25,8 +25,11 @@ exhibition — at thresholds configured per title. Encrypted content
 is stored on a content-addressed network. Access to decryption
 material is gated by current on-chain ownership, evaluated against
 live chain state by a native access layer, so that access moves with
-the token and no single party can release a key to a wallet that does
-not hold it. For content whose licensing
+the token. At maturity the access layer is decentralized and no
+single party can release a key to a wallet that does not hold it;
+during bootstrap a single foundation issuer performs this function,
+gating transfer and first-bind — never the playback of content a
+holder already possesses. For content whose licensing
 contractually requires endpoint protection, a *compliant tier* adds
 hardware-attested per-device key wrapping; a legacy
 deterministic-key construction survives only for public-domain
@@ -345,8 +348,11 @@ In the compliant tier:
   hardware secure element. The private key is non-extractable.
 - Content keys are wrapped to each compliant Seed's public key.
   Compromising one compliant Seed yields *that Seed's local content
-  only*; the network's aggregate exposure does not grow with the
-  network's size.
+  only* — a constant per-compromise bound with no catalog-scale
+  master secret. (Precisely: per-compromise yield does not grow with
+  network size; per-title leak probability does grow with holder
+  count, bounded by watermark attribution and revocation, not
+  cryptography — §7.4.)
 - Wrapped keys are unwrapped only inside the secure element. The
   unwrapped key never appears in main memory or on persistent storage
   outside the secure perimeter.
@@ -582,9 +588,11 @@ it, while threshold release supersedes the construction for new
 content.
 
 The canonical claim, stated precisely: *downloaded films play
-forever offline; re-download and transfer require the native access
-network to be live; no single-company
-point of failure.*
+forever offline; only re-download, first-bind, and transfer require
+the access layer to be live — at maturity with no single-company
+point of failure, and during bootstrap gated by a single foundation
+issuer whose liveness affects transfer and acquisition, never
+playback of what a holder already possesses.*
 
 In the compliant tier, this guarantee is engineered. Attestation
 gates the *issuance* of wrapped keys, not the *playback* of content
