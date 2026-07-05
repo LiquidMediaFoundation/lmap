@@ -128,9 +128,9 @@ No claim of "uncopyable" or "DRM-grade." Access control (ownership + binding) an
 
 ## 8. Updates this drives in canonical docs (editorial — remove before publication)
 
-- **`PROTOCOL_LAYERS.md`** — §4.2: retire the external threshold-service dependency as production access control; the native issuer (§4) replaces it. §4.3: promote from "spec'd, future" to **the day-1 production mechanism**. §4.5: reframe with attested per-device wrapping as the launch mechanism. Add the **binding model** — one active copy per token, an on-chain `bound`/`released` status flag, release-before-transfer with atomic marketplace settlement, and 30-day owner-initiated recovery for lost players (§2 here). Rename "certified tier / certified device" → "compliant tier / compliant device" throughout.
-- **`PROTOCOL_POSITIONING.md`** — §7 (two tiers): the *launch* tier is the compliant-hardware one; the permeable tier narrows to legacy public-domain demonstration. §8: add the device-compliance openness commitment and the §1.1 aligned-incentives framing. Note that attestation now carries launch weight *for endpoint protection* while access control remains ownership-cryptographic — position accordingly, without framing attestation as a licensing-driven "studio mode."
-- **Whitepaper** — §7 / §8 / §9: replace external-threshold-service language for production access control; adopt "compliant tier" naming. Separately, §9's "headless / thin-clients" framing is stale against the direct-player direction (a distinct, deferred item).
+**Status (2026-07-05): applied.** The whitepaper (v2.5), `PROTOCOL_LAYERS.md`, and `PROTOCOL_POSITIONING.md` have been brought into alignment across the Fable-review rework (branch `access-control-v2.5`): the Lit dependency retired to a swappable interim bridge; "certified tier" renamed "compliant tier"; the binding model (`boundCount`, release-before-transfer, transaction-triggered recovery) added; the compliant tier promoted from "V6-future" to the launch mechanism; direct-player propagated and the headless framing scoped to a secondary open-tier mode; trust claims tense-scoped; the per-N and watermarking claims restated honestly.
+
+**Remaining before publication:** (a) a fresh external re-review of the reworked set; (b) a full terminology-rename pass (generic "compliant" → "conformant"; "issuer" split per the PL glossary); (c) rebuild the PDF and update the wylloh.com link.
 
 ## 9. Open questions
 
