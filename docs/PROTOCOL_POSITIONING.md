@@ -369,11 +369,6 @@ protocol. Traditional consumer investors get a defensible commercial
 product line. The same playbook that built Stripe, MongoDB, and the
 Filecoin/Protocol Labs structure.
 
-**The moat is not secret code.** The moat is being the canonical
-default, having the filmmaker relationships, having shipped the
-polished apps, having earned the trust signal. None of that requires
-closed-source on the protocol layer.
-
 ---
 
 ## 9. What this means for filmmakers
