@@ -982,31 +982,34 @@ at this particular moment, command a specific price — no negotiation
 required.
 
 Commercial exhibition requires tokens to be staked for the exhibition
-period. The professional distribution system verifies on-chain that
-staked tokens meet the exhibition threshold before enabling playback.
-This is a **deliberately different regime from personal viewing, on
-the same fungible token.** A personal copy binds and plays offline
-forever, its playback never checking ownership (§7.2, §8) — correct,
-because the residual it leaves is one personal copy. Exhibition
-enforcement is the opposite by design: playback is **license-checked
-live**, because a bound-and-abandoned *exhibition* copy would retain a
-whole commercial rights package, not a personal one. The live check is
-therefore not a violation of the personal tier's "playback never
-checks" rule; it scopes that rule to personal copies and treats a
-venue as what it is — a **licensee**, for which live license
-enforcement is the historical norm. One token, two unlocks; and the
-liquidity flows between them — a collector's tokens can aggregate into
-a venue's exhibition stake, giving a sleeper film its theatrical run
-*after* it has already circulated digitally, then disperse back to
-collectors.
+period, and it enforces that stake through a **distinct, more-stringent
+regime from personal viewing — on the same fungible token.** A personal
+copy binds and plays offline forever, its playback never checking
+ownership (§7.2, §8) — correct, because the residual it leaves is one
+personal copy. Exhibition cannot use that fails-open model: a
+bound-and-abandoned *exhibition* copy would retain a whole commercial
+rights package, not a personal one. So exhibition playback is
+**licensed, not sovereign** — a venue is a **licensee**, and its
+entitlement is enforced at screening time. The *exact mechanism is
+deliberately left open*: DCP-grade exhibition content is far more
+sensitive than home content, and the exhibition interface must be
+**developed directly with the DCI community** to meet the industry's
+established requirements — engaging DCI/KDM frameworks rather than
+reinventing them — not asserted unilaterally here. What is firm is the
+**tiered unlock model** and the two-regime split, which scopes the
+personal tier's "playback never checks" rule to personal copies rather
+than contradicting it. One token, two unlocks; and the liquidity flows
+between them — a collector's tokens can aggregate into a venue's
+exhibition stake, giving a sleeper film its theatrical run *after* it
+has already circulated digitally, then disperse back to collectors.
 
 *Implementation status:* design intent, **forthcoming** — the launch
 focus is home viewing. Stacking thresholds are operational at the
-contract level today; the staking mechanism, the live exhibition-time
-license check, and the tier-accounting for commercial-exhibition
-windows are specified for a future protocol version (the two-regime
-decision is settled; the wire-level protocol is not — see the device
-compliance note §2.1).
+contract level today; the exhibition regime — its enforcement
+mechanism, its DCI/KDM interface, DCP-grade asset protection, and the
+staking/tier accounting — is **TBD, to be worked directly with the DCI
+community** (the tiered unlock model and the two-regime split are
+settled; the mechanism is not — see the device compliance note §2.1).
 
 ## 12. Production Funding {-}
 
