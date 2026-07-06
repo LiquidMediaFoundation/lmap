@@ -6,7 +6,7 @@
 
 ## 1. Principles
 
-Under LMAP, playback of protected content occurs on a **compliant device** — a player meeting a published hardware conformance specification (§3) — and decryption is gated by **current on-chain ownership** of the entitling token. Access control is **native to the protocol**: it depends on no external key-management service.
+Under LMAP, playback of protected content occurs on a **compliant device** — a player meeting a published hardware conformance specification (§3) — and decryption is gated by **current on-chain ownership** of the entitling token. Access control is **native to the protocol**: it depends on no external key-management service. (At bootstrap a single Foundation-operated issuer performs key issuance under this rule — a temporary centralization internal to the protocol's own standards body, not a rented external dependency; §5 dissolves it into a threshold network with no single trusted party.)
 
 This independence is a protocol requirement, not a preference. A participant's access to content they own must never be contingent on a third party's continued operation or business decisions; an access layer rented from an outside service would make every holder's ownership revocable by that service's fate — the dependency LMAP exists to remove. (Downloaded content therefore plays indefinitely offline; see §6.)
 

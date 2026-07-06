@@ -460,11 +460,17 @@ control*. Threshold release correctly enforces that a wallet can
 obtain a decryption key only while that wallet currently holds the
 relevant token. Transfers cause access to move with the token; the
 seller's next decryption attempt fails the on-chain check; the
-buyer's succeeds. The threshold network is a distributed substrate
-of cryptographic nodes native to the protocol; no single
-party — not the foundation, not Wylloh, not the protocol's own
-contracts — can release a key to a wallet that does not currently
-satisfy the access condition. **What threshold release does not do:**
+buyer's succeeds. The protocol's rule is that no single party — not
+the foundation, not Wylloh, not the protocol's own contracts — may
+release a key to a wallet that does not currently satisfy the access
+condition. At maturity this rule is enforced directly by a distributed
+substrate of cryptographic nodes native to the protocol, with no
+single party able to break it; during bootstrap a single Foundation
+issuer performs the release under that same rule, a temporary
+centralization the decentralization roadmap (§7.3) dissolves. In
+neither case does issuer or network liveness gate the *playback* of
+content a holder already possesses (§8) — only first release and
+transfer. **What threshold release does not do:**
 it does not, and no software-only mechanism can, prevent a legitimate
 holder from capturing or copying the plaintext stream once they
 have legitimately decrypted it. That is the analog hole and the
@@ -965,9 +971,11 @@ A specific guidance for technical readers: when evaluating the
 protocol's claims, separate three distinct claims that should not
 be conflated. (1) The *access-control claim*: threshold-mediated
 key release correctly gates decryption by current on-chain
-ownership, evaluated by a distributed network of cryptographic
-nodes, with no single party able to release a key to a
-non-holder. (2) The *endpoint-protection claim*: hardware-attested
+ownership. At maturity it is evaluated by a distributed network of
+cryptographic nodes with no single party able to release a key to a
+non-holder; during bootstrap a single Foundation issuer performs the
+release under that same rule (§7.3), its liveness affecting transfer
+and first release, never playback of content already held. (2) The *endpoint-protection claim*: hardware-attested
 per-device key wrapping at the compliant tier constrains what the
 playback device can do with the decrypted stream, addressing the
 legitimate-viewer-attempting-capture threat that no software-only
