@@ -446,7 +446,12 @@ the tools for coordination and honest disclosure; it lets the market
 decide where to use them.
 
 A bound copy plays indefinitely offline; the binding is recorded,
-never re-verified, so playback never contacts the network. If a
+never re-verified, so playback never contacts the network. A
+cooperating, online device also *self-audits* at its own next
+transaction — shedding any bound title whose wallet no longer owns
+it — so an actively-used device cannot retain copies it has sold; this
+check runs only at voluntary transactions and on confirmed
+non-ownership, never during playback. If a
 bound device is lost, sold, or destroyed, playback
 of its already-bound content is unaffected (it fails open) and the
 token's transferability is recovered by an owner-signed **report**
