@@ -3,7 +3,14 @@
 > A living document on what LMAP is, what it isn't, and how it
 > relates to the clients, hardware, and marketplaces that build on it.
 >
-> **Status:** Living document. Last revised April 2026.
+> **Status:** Living document — **v2.5 rework in progress (July 2026).**
+> Where any statement here conflicts with the whitepaper (v2.5),
+> `PROTOCOL_LAYERS.md`, or `DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`,
+> **those are canonical** and this doc is stale pending its pass. Known
+> stragglers being corrected: the §7 tier table (compliant tier is the
+> *day-1 launch* mechanism, not long-horizon; open-tier encryption is
+> threshold-mediated key release, not the retired public-data
+> derivation), the §8 feature list, and license/positioning lines.
 >
 > Opening sections are written to potentially become web copy. Later
 > sections go deeper.
@@ -269,10 +276,10 @@ narrow: hardware attestation for premium content keys.
 | Property | Open tier | Compliant tier |
 |---|---|---|
 | Trust anchor | Wallet identity | Wallet + secure-element-attested device |
-| Encryption | AES-256-GCM + public-data key derivation | AES-256-GCM + per-device-wrapped keys |
+| Encryption | AES-256-GCM + threshold-mediated key release (legacy public-data derivation retired to public-domain demo) | AES-256-GCM + per-device-wrapped keys |
 | Hardware required | None (any conformant Seed) | Compliant Seed with secure element |
-| Content scope | Public domain, indie, Creative Commons | Studio-licensed (long-horizon) |
-| Implementation status | Shipped today | Spec'd; reference implementation in development |
+| Content scope | Public domain, indie, Creative Commons, paid indie | Premium / endpoint-protection-required |
+| Implementation status | Shipped (public-domain); threshold migration in progress | Day-1 launch mechanism (Seed-gated); wire specs in active specification |
 
 **The critical invariant: the ownership token is always yours to
 move.** The token is provably owned on-chain and is the license
@@ -317,8 +324,10 @@ or Ethereum a protocol distinct from any single Ethereum company.
 - Reading the registry (query any film, any balance, from any RPC)
 - The IPFS file format (chunked AES-GCM, documented in
   `PROTOCOL_LAYERS.md` §4)
-- The token-based key derivation (SHA-256 of contract:tokenId, no
-  secrets)
+- The legacy token-based key derivation (SHA-256 of contract:tokenId,
+  no secrets) — **retired as a production model** and scoped to
+  public-domain demonstration content; production open-tier access is
+  threshold-mediated key release (whitepaper §7.1)
 - Building clients — marketplaces, players, curation layers — against
   the protocol
 - Running a storage service against the protocol (the download API is
@@ -373,8 +382,8 @@ their own commercial terms):
 
 - **Crypto-native investors** (a16z Crypto, Polychain, Variant,
   Protocol Labs, 1confirmation): the protocol is open, credibly
-  neutral, MIT-licensed. Every film minted on LMAP is portable to
-  any third-party marketplace. This is the open-protocol play.
+  neutral, Apache-2.0-licensed. Every film minted on LMAP is portable
+  to any third-party marketplace. This is the open-protocol play.
 - **Hardware/infrastructure investors** (Playground Global, 1517
   Fund, Foundry): the consumer products built on the protocol —
   starting with the Origin Seed — are commercial, defensible by
