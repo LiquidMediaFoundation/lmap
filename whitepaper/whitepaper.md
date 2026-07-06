@@ -335,6 +335,18 @@ DVD-level protection at the playback edge: cryptographic
 enforcement of access; honest acknowledgment that the analog hole
 and post-decryption copy are not prevented.
 
+**A resale consequence, stated plainly.** Because permanence caches
+the master key locally after first decryption (§8), an open-tier
+holder who has *ever* played a film keeps a working copy and key even
+after selling the token. The open tier therefore has **no copy
+scarcity**: what an open-tier secondary buyer acquires is the license,
+the on-chain provenance, and future access — explicitly *not*
+exclusivity against a seller who has already decrypted. This is the
+deliberate open-tier posture, and the same one physical media took;
+enforceable one-copy-per-token scarcity is precisely what the
+compliant tier's binding (§7.2) adds, which is why premium content
+that requires it uses that tier.
+
 ### 7.2 Compliant Tier {-}
 
 Studios and rights holders who require contractual digital-rights
@@ -465,13 +477,16 @@ as a precondition of its next transaction, and a refusing device is
 revoked. This yields one-copy-per-token scarcity *for trade conducted
 through honest platforms and escrow*, with no continuous ownership
 check — enforcement only at the discrete moments of binding and
-release. Two residuals remain, both bounded, forensically watermarked
-(§7.5), and harmless to a buyer's guarantee of a working title: a
-compromised device that reports `released` while retaining its copy;
-and — because raw transfer always works — a still-bound unit moved
-outside an escrowed sale, which the registry surfaces as
-`boundCount > balance` for that wallet. These are the physical-media-
-tier cost of preserving free exchange, priced in rather than designed
+release. Two residuals remain, harmless to a buyer's guarantee of a
+working title: a compromised device that reports `released` while
+retaining its copy; and — because raw transfer always works — a
+still-bound unit moved outside an escrowed sale, which the registry
+surfaces as `boundCount > balance` for that wallet. Both are
+physical-media-tier personal leakage rather than a redistribution
+vector, and their *bound* — "forensically watermarked, hence
+attributable" — is **conditional** on integrating a watermark scheme
+with measured robustness (§7.5), not a delivered property. They are
+the cost of preserving free exchange, priced in rather than designed
 out.
 
 ### 7.3 Attestation Issuers and the Federated Framework {-}
