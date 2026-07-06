@@ -722,17 +722,27 @@ maintains availability proportional to its audience. No central
 coordination determines what Seeds store; ownership patterns drive
 distribution.
 
-This architecture inverts conventional streaming economics.
-Centralized platforms bear infrastructure costs proportional to
-viewership: success is expensive. In the Seed network, increased
-viewership means more Seeds joining, distributing load across more
-nodes. Per-stream costs approach zero as the network grows. The
-system becomes more efficient at scale rather than more costly.
-Seeds participate by default because their primary value to the
-operator is local — the films they own, accessible to
-LMAP-compatible playback clients on their local network — so
-network participation is a beneficial side effect rather than the
-purchase rationale. This is precisely the property that
+This architecture inverts conventional streaming economics — with a
+dependency we state plainly. Centralized platforms bear infrastructure
+costs proportional to viewership: success is expensive. In the Seed
+network, viewers who *operate a Seed* add capacity as they add demand,
+so per-stream cost falls as the operator fleet grows. The inversion is
+therefore a property of an *operator* network, not of browser
+distribution: browser-only buyers add demand without adding capacity,
+and the cost curve inverts only above a modest **operator attach
+rate** — the fraction of viewers who run a Seed rather than watch
+through a hosted client. We do not yet publish a measured figure for
+that rate or for residential-uplink performance at 4K HDR bitrates;
+the claim is directional, and its precondition is named rather than
+assumed. Two things make the attach rate realistic: the reference
+Seed's standalone utility (§16) gives viewers a reason to own one
+independent of any network reward, and the Foundation treasury funds
+baseline pinning redundancy (§10.1) so availability never depends on
+attach rate for low-operator or long-tail titles. Seeds participate by
+default because their primary value to the operator is local — the
+films they own, accessible to LMAP-compatible playback clients on
+their local network — so network participation is a beneficial side
+effect rather than the purchase rationale. This is precisely the property that
 distinguishes a Seed from the token-incentivized storage networks
 whose hardware had no standalone value (§16).
 
