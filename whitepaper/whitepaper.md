@@ -135,7 +135,7 @@ all-or-nothing transactions.
 
 *Implementation status:* design intent. The current V4.1 registry is
 the ERC-1155 distribution layer; the ERC-721 copyright registry is
-specified for a future protocol version (V5+) and has not yet been
+specified for a future protocol version (V6) and has not yet been
 deployed. The current protocol's role-gated minting (see §15) serves
 as a near-term substitute for the copyright registry's
 supply-modification controls.

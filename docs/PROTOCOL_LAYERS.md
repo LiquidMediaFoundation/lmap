@@ -353,7 +353,7 @@ Polygon mainnet, immutable, and verified.
 - **Royalty splits** (shipped). 2.5% protocol fee hardcoded;
   filmmaker receives 97.5%. Splits payable on every primary and
   secondary-market transaction routed through the protocol contract.
-- **ERC-721 copyright registry** (spec'd, not deployed). Future V5
+- **ERC-721 copyright registry** (spec'd, not deployed). Future **V6**
   contract for representing copyright ownership (ERC-721) separately
   from distribution rights (ERC-1155). Mirrors how rights actually
   work in entertainment law: copyright is owned, distribution rights
