@@ -401,31 +401,59 @@ element). The architectural model mirrors theatrical distribution
 under DCI: the encrypted DCP is portable and freely distributable;
 only certified projectors with KDM-bound keys can play.
 
-**One active copy: binding and release.** Per-device wrapping gives
-the compliant tier a property the open tier does not have —
-enforceable scarcity. A wrapped key is *bound* to one secure element
-at a time, and each token carries an on-chain status of `bound` or
-`released`. A bound copy plays indefinitely offline; the binding is
-recorded, never re-verified, so playback never contacts the network.
-To transfer a token, the holder first *releases* it: the bound device
-deletes its wrapped key, and the status flips to `released`. A
-conforming marketplace settles a sale only against a `released`
-token, atomically with payment and royalty, so a buyer can never
-acquire a copy that is still bound elsewhere; a raw token transfer
-outside a conforming marketplace is caveat emptor, and wallets warn
-on a `bound` token. If a bound device is lost, sold, or destroyed, playback
+**One active copy: binding, release, and free exchange.** Per-device
+wrapping gives the compliant tier a property the open tier does not
+have — enforceable scarcity, furnished as a *tool* rather than imposed
+as a lock. A wrapped key is *bound* to one secure element at a time.
+Because the entitling token is a *fungible* ERC-1155 unit, there is no
+distinguishable "the token" to flag; binding is tracked instead as a
+**count per `(wallet, tokenId)`** — `boundCount` — under the invariant
+`boundCount ≤ balance`, so a wallet's transferable units are
+`balance − boundCount`. This count lives in an **on-chain binding
+registry from launch**: world-readable, so any platform, wallet, or
+prospective buyer can verify a unit's released status without trusting
+a private ledger. At launch the issuer is the registry's sole
+writer — it increments on bind and decrements on an attested
+release — and what decentralizes over time is *who may write it*
+(single issuer → federated anchors → threshold network), never the
+addition of a transfer veto. The token itself remains a plain ERC-1155
+throughout, so tokens minted at launch carry forward unchanged.
+
+**The registry informs; it never gates.** The entitling token
+transfers freely on-chain at all times — a gift, an inheritance, or a
+direct peer sale needs no one's permission — and the protocol does not
+let the issuer, or any party, block the exchange of an owned token.
+That is the boundary the protocol will not cross. Safe trade is then
+built on the tool by choice: to sell without residual a holder
+*releases* a unit (the bound device deletes its wrapped key and
+attests it; `boundCount` decrements); an escrow contract can settle a
+sale atomically against the registry, so a buyer transacting through
+it never pays for a still-bound unit; and a platform may list only
+released units, or surface a `bound` warning on the rest. These are
+platform policies resting on a protocol-furnished flag — where the
+protocol sets down and platforms pick up (§15). The protocol supplies
+the tools for coordination and honest disclosure; it lets the market
+decide where to use them.
+
+A bound copy plays indefinitely offline; the binding is recorded,
+never re-verified, so playback never contacts the network. If a
+bound device is lost, sold, or destroyed, playback
 of its already-bound content is unaffected (it fails open) and the
 token's transferability is recovered by an owner-signed **report**
 that releases the titles after a 30-day window — **no heartbeat or
 presence beacon**; the device verifiably erases the released titles
 as a precondition of its next transaction, and a refusing device is
-revoked. This
-restores one-copy-per-token scarcity, and with it collectible and
-resale value, without any continuous ownership check: enforcement
-occurs only at the discrete moments of binding and release. The
-residual — a compromised device that reports `released` while
-retaining its copy — is bounded, forensically watermarked (§7.5),
-and does not affect a buyer's guarantee of a working title.
+revoked. This yields one-copy-per-token scarcity *for trade conducted
+through honest platforms and escrow*, with no continuous ownership
+check — enforcement only at the discrete moments of binding and
+release. Two residuals remain, both bounded, forensically watermarked
+(§7.5), and harmless to a buyer's guarantee of a working title: a
+compromised device that reports `released` while retaining its copy;
+and — because raw transfer always works — a still-bound unit moved
+outside an escrowed sale, which the registry surfaces as
+`boundCount > balance` for that wallet. These are the physical-media-
+tier cost of preserving free exchange, priced in rather than designed
+out.
 
 ### 7.3 Attestation Issuers and the Federated Framework {-}
 
@@ -1241,9 +1269,10 @@ of this paper's publication:
   presale-funding milestone-escrow contracts; threshold dispersal of
   ciphertext shards; **federation of the attestation issuer and
   decentralization of the compliant-tier key service from single →
-  federated → threshold** (§7.3); and the on-chain binding registry
-  and transfer-hook enforcement that succeed the launch's issuer-gated
-  binding (§7.2).
+  federated → threshold** (§7.3), which also decentralizes *who may
+  write* the on-chain binding registry (§7.2). The registry itself is
+  a launch component, not a future one; the protocol adds no
+  transfer-veto — exchange stays free by design.
 - **Long-horizon (operational maturity required):** studio-grade
   compliant-tier engagement with major rights holders.
 
@@ -1268,17 +1297,21 @@ as a swappable interim bridge behind a stable interface. (2) **The
 "certified tier" is renamed the "compliant tier"** throughout, naming
 the tier by the open conformance standard a device meets rather than
 by an authority's grant. (3) **A binding model is added to the
-compliant tier (§7.2).** Per-device wrapping now carries an on-chain
-`bound`/`released` status: a copy binds to one secure element at a
-time, plays offline indefinitely, and must be *released* — the device
-deletes its wrapped key — before its token can be transferred; a
-conforming marketplace settles only against a released token,
-atomically with payment and royalty, and an owner-signed report
-releases a lost device's titles after a 30-day window (no presence
-beacon), with transaction-gated erasure. This restores
-one-copy-per-token scarcity, and with it collectible and resale
-value, without any continuous ownership check — resolving the
-sovereignty-versus-scarcity tension in favor of both. Companion
+compliant tier (§7.2).** Per-device wrapping now tracks binding as a
+`boundCount` per `(wallet, tokenId)`, recorded in an **on-chain,
+world-readable binding registry from launch** (issuer-written; the
+token stays a plain ERC-1155): a copy binds to one secure element at a
+time, plays offline indefinitely, and is *released* — the device
+deletes its wrapped key — before a unit trades without residual. The
+registry *informs* rather than *gates*: the token transfers freely
+on-chain at all times, the protocol lets no party block exchange, and
+scarcity for safe trade comes from platforms honoring the flag plus
+opt-in escrow that settles atomically against it. An owner-signed
+report releases a lost device's titles after a 30-day window (no
+presence beacon), with transaction-gated erasure. This restores
+one-copy-per-token scarcity for honest trade, and with it collectible
+and resale value, without any continuous ownership check — resolving
+the sovereignty-versus-scarcity tension in favor of both. Companion
 documents (`PROTOCOL_LAYERS.md`, `PROTOCOL_POSITIONING.md`) are being
 brought into alignment (a multi-pass rework in progress).
 

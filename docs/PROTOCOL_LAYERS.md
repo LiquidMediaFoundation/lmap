@@ -217,13 +217,25 @@ forensic-grade attribution is required:
   revocation registry (Layer 3); subsequent key issuance refuses
   the revoked device's attestation.
 - **Binding — one active copy.** A wrapped key is bound to one secure
-  element at a time; each token carries an on-chain `bound`/`released`
-  status. A bound copy plays offline indefinitely (the binding is
-  recorded, never re-verified). To transfer, the holder *releases*
-  (the device deletes its wrapped key; status → `released`); a
-  conforming marketplace settles only against a `released` token,
-  atomically with payment and royalty, so a buyer never acquires a
-  copy bound elsewhere. A lost, sold, or broken device is recovered
+  element at a time. The entitling token is a *fungible* ERC-1155
+  unit, so binding is a **count per `(wallet, tokenId)`** — `boundCount`,
+  under `boundCount ≤ balance` (transferable = `balance − boundCount`) —
+  *not* a per-token flag. The count lives in an **on-chain,
+  world-readable binding registry from launch**; the key issuer
+  (§glossary) is its sole writer at launch, and what decentralizes over
+  time is *who may write it* (single issuer → federated → threshold),
+  never a transfer veto. The token stays a plain ERC-1155 throughout.
+  **The registry informs; it never gates:** the token transfers freely
+  on-chain at all times and the protocol lets no party — issuer
+  included — block the exchange of an owned token. A bound copy plays
+  offline indefinitely (the binding is recorded, never re-verified). To
+  trade without residual the holder *releases* a unit (the device
+  deletes its wrapped key and attests the deletion; `boundCount`
+  decrements); an escrow contract can settle a sale atomically against
+  the registry so a buyer transacting through it never acquires a unit
+  whose copy is bound elsewhere, and a platform may list only released
+  units or warn on the rest — coordination built on the flag, not
+  enforced by fiat. A lost, sold, or broken device is recovered
   by an owner-signed **report** that releases its titles after a
   30-day window (no heartbeat or presence beacon); the device
   verifiably erases them as a precondition of its next transaction,
