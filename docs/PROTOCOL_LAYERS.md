@@ -19,6 +19,10 @@
 > - `docs/seed-one/ARCHITECTURE.md` — what the reference Seed *does*
 > - `docs/seed-one/INDUSTRIAL_DESIGN.md` — what the reference Seed *is*
 > - `docs/seed-one/ORIGIN_SPEC.md` — *how to actually build* the reference Seed
+>
+> *The `docs/seed-one/` and `docs/drafts/` references throughout this
+> document are **internal / not yet published in this repository**;
+> they will be published as the reference-Seed program opens.*
 
 ---
 
@@ -33,7 +37,7 @@ different layers as long as the interfaces are honored.
 |---|---|---|---|
 | 0 | Trust Anchors | Cryptographic primitives; hardware roots; wallet identity; contract immutability | Partial |
 | 1 | Storage | Content distribution substrate (IPFS, manifests) | Shipped (open tier) |
-| 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking | Shipped (open tier); spec'd (compliant tier) |
+| 2 | Cryptography | Encryption, key hierarchy, threshold-mediated key release, dispersal, watermarking | Shipped (open tier); spec'd (compliant tier) |
 | 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers | Shipped (V4.1 distribution); spec'd (V6 copyright) |
 | 4 | Network | Peer discovery, shard request/response, LAN streaming | Partial: reference daemon serves open-tier LAN (HTTP byte-range + mDNS) today; peer protocol + HLS transport spec'd/future |
 | 5 | Attestation | Compliant-tier hardware attestation (the open tier requires none) | Spec'd; not yet implemented |
@@ -50,9 +54,10 @@ on Attestation): the protocol supports two distinct trust modes.
 *Open tier* runs on any conformant Seed implementation, with permissive
 content (public domain, indie, Creative Commons, opt-in creators).
 *Compliant tier* requires hardware attestation from an LMAP-trusted
-certification authority and gates studio-grade content. Both tiers
-run the same layered protocol; the gating is narrow and lives at
-Layer 5.
+certification authority and gates **premium / endpoint-protection-required**
+content (the day-1 launch tier; studio-licensed content is the
+long-horizon case). Both tiers run the same layered protocol; the
+gating is narrow and lives at Layer 5.
 
 ---
 
@@ -521,8 +526,10 @@ custom mobile app, etc.) are welcome.
 
 ### 7.2 Compliant tier
 
-Seeds carrying hardware attestations from a federated certification
-authority. Required for studio-licensed content. Revocable. Audited.
+Seeds carrying hardware attestations from the certification authority
+(Foundation-only at launch, federating over time). The day-1 launch
+mechanism for **premium / endpoint-protection-required** content;
+studio-licensed content is the long-horizon case. Revocable. Audited.
 
 **Certification credential, technically:**
 - Each compliant Seed holds a per-device keypair generated inside
@@ -709,7 +716,7 @@ prevents the layered abstraction from collapsing into a monolith.
 Layer 7 — Governance      ↑ (foundation, federation, voting)
 Layer 6 — Application     ↑ (storefronts, library UI, playback apps, integrator tools)
 Layer 5 — Attestation     ↑ (open tier / compliant tier split)
-Layer 4 — Network         ↑ (Seed peer protocol, LAN streaming via HLS+mDNS)
+Layer 4 — Network         ↑ (Seed peer protocol, LAN streaming: HTTP byte-range/mDNS today, HLS the target — §6)
 Layer 3 — Entitlement     ↑ (ERC-1155 distribution, ERC-721 copyright, royalties, staking)
 Layer 2 — Cryptography    ↑ (AES-256-GCM, two-tier keys, threshold dispersal, watermarking)
 Layer 1 — Storage         ↑ (IPFS, manifests, future shard dispersal)

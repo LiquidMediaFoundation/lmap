@@ -385,7 +385,8 @@ or Ethereum a protocol distinct from any single Ethereum company.
   ERC-1155 semantics, no permission needed
 - The LMAP SDK and reference implementations (storage service,
   encryption library, registry interface)
-- The wylloh.com web client (MIT-licensed, on GitHub)
+- The wylloh.com web client (on GitHub under its own license — MIT for
+  the client artifact; distinct from the protocol's Apache-2.0)
 - The Origin Seed firmware reference (will be open-sourced when the
   reference implementation reaches v1)
 

@@ -35,8 +35,10 @@ hardware-attested per-device key wrapping; a legacy
 deterministic-key construction survives only for public-domain
 demonstration content. A
 network of user-operated nodes — *Seeds* — distributes content,
-inverting the conventional cost model: the network strengthens as
-viewership grows. Smart contracts automate royalty distribution on
+inverting the conventional cost model *as viewers become node
+operators*: above a modest operator attach rate the network
+strengthens as viewership grows (the precondition is stated plainly
+in §9, not assumed). Smart contracts automate royalty distribution on
 every transaction, including secondary sales where collectors can
 sell exhibition rights directly. The protocol is governed by an
 independent foundation, structurally distinct from any commercial
@@ -186,10 +188,19 @@ of a split, not a side effect. One honest consequence to name: since a
 holder may bind up to `balance` copies (§7.2), a split proportionally
 raises how many simultaneous copies each holder can run — a split is
 itself a form of authentic-supply expansion, which is precisely how
-the protocol answers scarcity-driven piracy (§14). New
-creative works — sequels, adaptations, alternative cuts — are
-tokenized as separate token IDs with independent supplies, leaving
-original token markets undisturbed.
+the protocol answers scarcity-driven piracy (§14). A useful frame for
+this deliberate accessibility increase is a **wide theatrical
+release**: lowering the bar to entry widens distribution of the same
+work — the split trades per-token price for reach, by the holders'
+own vote. New creative works — sequels, adaptations, alternative
+cuts — are tokenized as separate token IDs with independent supplies,
+so the original token's market stays *distinct*. One honest limit: per-ID
+supply is protected, but nothing prevents the same film being re-minted
+as a "remaster" under a *new* ID (under V5, permissionlessly, by
+anyone). On-chain provenance disambiguates the authentic edition from a
+copy, but a competing edition's market impact can still land; the
+protection is *distinctness and provenance*, not economic exclusivity
+against every re-issue.
 
 *Implementation status:* shipped. Stacking thresholds and on-chain
 enforcement are operational in V4.1.
@@ -749,8 +760,16 @@ record as the durable source of truth. A user whose Seed has died
 can re-acquire wrapped keys for their owned films onto a new
 compliant Seed, because the wallet's holdings are recoverable from
 the blockchain. **The blockchain remembers; the hardware is
-replaceable.** This is a stronger guarantee than physical media,
-which has no equivalent recovery path when a disc fails.
+replaceable.** Physical media has no equivalent recovery path when a
+disc fails, so at maturity this is a stronger guarantee. Stated with
+its conditions, since it is a comparison: recovery requires a
+compliant issuer to be alive and willing to re-wrap (at bootstrap, one
+Foundation-operated issuer), a compliant player still being
+manufactured, and — for a lost or dead player — the 30-day recovery
+window (§7.2). Physical media's disc failure has no recovery, but also
+no counterparty; the compliant tier trades a counterparty dependency
+for a recovery path, and is honest that the trade is only fully in the
+holder's favor once the issuer is decentralized (§7.3).
 
 ## 9. The Seed Network {-}
 
@@ -1320,8 +1339,8 @@ We have proposed a protocol for film distribution addressing
 fundamental misalignments in centralized streaming. By tokenizing
 films into standardized units with embedded licensing rights, we
 create genuine digital ownership. By distributing content through a
-peer-to-peer network growing stronger with demand, we invert
-economics that punish platforms for success. By automating royalty
+peer-to-peer network that grows stronger with demand as viewers become
+operators (§9), we invert economics that punish platforms for success. By automating royalty
 distribution including on secondary sales, we ensure transparent
 creator compensation through markets that never existed for physical
 media.
