@@ -192,17 +192,20 @@ must not be rentable from, or revocable by, any party outside that
 framework. A mature external threshold network may serve only as a
 swappable interim bridge behind a stable interface, never as a
 dependency the protocol's guarantees rest on. This mechanism serves
-**open-tier** (no-hardware) content; commercial titles, and the
-flagship Seed-gated launch, use the **compliant tier's** per-device
-wrapping and binding model (§4.3).
+**open-tier** (no-hardware) content — including *paid* indie titles
+that need no endpoint protection; **premium / endpoint-protection-required**
+titles, and the flagship Seed-gated launch, use the **compliant
+tier's** per-device wrapping and binding model (§4.3). ("Commercial"
+= sold for money and spans both tiers; it is not a synonym for the
+compliant tier — whitepaper §7.)
 
 For the canonical specification of both, see whitepaper v2.5 §7.
 
-### 4.3 Compliant-tier key wrapping and binding (the day-1 commercial mechanism)
+### 4.3 Compliant-tier key wrapping and binding (the day-1 premium mechanism)
 
-For commercial titles — the tier the flagship Seed-gated launch is
-built on — and any content where endpoint protection or
-forensic-grade attribution is required:
+For **premium / endpoint-protection-required** titles — the tier the
+flagship Seed-gated launch is built on — and any content where endpoint
+protection or forensic-grade attribution is required:
 
 - **Per-device wrapping.** Content keys are wrapped to each compliant
   Seed's public key, derived from its secure element. Each Seed gets

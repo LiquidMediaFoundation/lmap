@@ -255,6 +255,14 @@ endpoint protection (the
 wrapping at Layer 5. Both tiers run the same protocol underneath;
 they differ only in what stands between a holder and the plaintext.
 
+A note on one word, used precisely throughout: **"commercial" means
+*sold for money*** — as opposed to free or public-domain content. It
+is *not* a synonym for either tier. Commercial content spans both:
+paid indie content sold on the open tier, and premium or
+studio-licensed content whose contracts require endpoint protection on
+the compliant tier. When this paper means the latter specifically, it
+says *premium* or *endpoint-protection-required*, not "commercial."
+
 ### 7.1 Open Tier {-}
 
 Any conformant Seed implementation serves content licensed under
@@ -640,8 +648,11 @@ storage are shipped on Polygon mainnet via the V4.1 registry.
 end-to-end across two independent architectures (macOS arm64,
 Raspberry Pi aarch64) using the legacy deterministic key-derivation
 construction. The **compliant tier** — attested per-device binding on the sealed
-direct player (§7.2) — is the launch access-control mechanism for
-commercial content, consistent with a Seed-gated first release. Its
+direct player (§7.2) — is the launch access-control mechanism for the
+first, premium, endpoint-protection-required release, consistent with
+a Seed-gated first title. (Paid indie content that needs no endpoint
+protection is *also* commercial, and rides the open tier once its
+threshold-release migration lands — see the Implementation Status.) Its
 wire-level attestation specification, conformance suite, and the
 Foundation's first (single) issuer are the highest-priority near-term
 deliverables of the launch build; hardware binding is declared
@@ -1302,12 +1313,15 @@ of this paper's publication:
   (macOS arm64, Raspberry Pi aarch64) with byte-identical output.
   The V4.1 contract continues to serve existing tokens under the
   legacy construction.
-- **In active migration (blocking commercial-content
+- **In active migration (blocking *open-tier* commercial-content
   onboarding):** migration of the Wylloh reference web client and
   Seed daemon from the legacy derivable-key construction to
   native threshold-mediated key release.
   Completion of this migration is a prerequisite for tokenizing
-  any commercial content; the V4.1 deployment continues to serve
+  commercial content *on the open tier* (paid indie content needing
+  no endpoint protection); it does not gate the premium, compliant-tier
+  first release, whose launch mechanism is attested binding (below).
+  The V4.1 deployment continues to serve
   already-tokenized public-domain content under the legacy
   construction during and after the migration. The Wylloh
   reference implementation scopes the open-tier framing
