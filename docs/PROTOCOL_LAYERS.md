@@ -416,14 +416,24 @@ that trades endpoint protection for reach:
 **What this layer guarantees:**
 - Seeds can find content available on the network without central
   coordination
-- A Seed serves *open-tier* content to companion client apps over the
-  LAN as standard HLS; compliant-tier playback stays on the direct player
+- **Carriage is open for both tiers.** *Any* device — attested or
+  not — can hold, pin, and serve the encrypted bytes of open- *and*
+  compliant-tier content across the swarm; attestation gates only
+  *decryption/playback*, never *carriage* (whitepaper §7.2, mirroring
+  DCI: the encrypted DCP is freely distributable; only certified
+  players decrypt it). Gating carriage would shrink the premium-title
+  swarm to the attested-player fleet and defeat the member-owned-CDN
+  property (§10.1, whitepaper §9).
+- LAN *playback delivery* differs by tier: a Seed streams *open-tier*
+  content to companion client apps over the LAN as standard HLS, while
+  compliant-tier playback stays on the sealed direct player
 - Compromised peers can be deprioritized without protocol-level
   coordination
 
 **Interfaces above:**
-- Layer 5 (attestation) gates which Seeds can serve compliant-tier
-  content
+- Layer 5 (attestation) gates which devices can *decrypt and play*
+  compliant-tier content — not which Seeds may carry or serve its
+  encrypted bytes (carriage is open to any device)
 - Layer 6 (application) consumes the LAN streaming protocol
 
 **Interfaces below:**
@@ -588,7 +598,7 @@ based wallets sign on the user's behalf.
 | 1 | Standard IPFS pinning | Same, plus per-device wrapped manifest |
 | 2 | Public-data-derived keys (permeable by design) | Per-device-wrapped keys, hardware-bound (per-N security) |
 | 3 | Same registries | Same registries plus revocation list |
-| 4 | Any Seed can serve | Only compliant Seeds can serve |
+| 4 | Any Seed can carry & serve | Any Seed can carry & serve the encrypted bytes; only an attested device can decrypt & play |
 | 5 | No attestation required | Hardware attestation required |
 | 6 | Any client app | LMAP-conformant clients (or compatible ones) |
 | 7 | Foundation governs spec | Foundation + CAs govern certification |
