@@ -7,8 +7,14 @@ LMAP defines how digital media — beginning with film — can be
 tokenized as on-chain entitlements, encrypted and content-addressed
 on public storage, and delivered through a peer network independent
 of any single platform. The token is the license. The bytes are
-encrypted and content-addressed. Anyone can build storefronts,
-players, or hardware that conforms to the spec.
+encrypted and content-addressed. The open-tier surface — token,
+encryption, content-addressing, and the reference daemon — is
+buildable against today; the compliant-tier conformance spec
+(attestation, binding, settlement) is in active drafting, so
+hardware/player conformance is a near-term deliverable, not yet a
+finished target. Anyone can build storefronts, players, or hardware
+on LMAP; see the Implementation Status below for what is buildable now
+versus forthcoming.
 
 What this enables, in consumer language: **liquid media** —
 physical-grade ownership in liquid digital form.

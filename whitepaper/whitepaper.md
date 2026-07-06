@@ -377,16 +377,20 @@ obtaining a lower tier's key never derives a higher tier's; the exact
 construction is fixed in the forthcoming technical specification.
 
 **Hardware binding is a normative requirement of the compliant tier.**
-A compliant compliant-tier implementation MUST use a hardware secure
+A compliant-tier implementation MUST use a hardware secure
 element to (a) generate the per-device keypair, (b) hold the private
 key in non-extractable form, (c) perform key unwrapping, and (d) sign
 attestation reports. An implementation that performs any of these
 operations outside a hardware secure element is not conformant with
-LMAP V6 and MUST NOT be marketed as such. This is the protocol-level
-guarantee studios rely on when authorizing content for the compliant
-tier. Wire-level specifics of the attestation report format, the
-attestation credential schema, and the issuer federation protocol are
-committed to a separate LMAP V6 technical specification, forthcoming.
+the LMAP compliant-tier specification and MUST NOT be marketed as
+such. This is the protocol-level guarantee studios rely on when
+authorizing content for the compliant tier. The wire-level specifics
+that make this checkable — the attestation report format, the
+attestation credential schema, the issuer federation protocol, and a
+machine-checkable conformance suite — are **in active specification as
+launch deliverables** (see Implementation Status), not yet published;
+until they are, "conformant" is a stated requirement, not something a
+third party can yet build and verify against.
 
 A clarifying distinction: only the *decryption* step requires
 compliant hardware. Encrypted compliant-tier content is freely
@@ -488,9 +492,14 @@ TLS infrastructure: independent issuers, audited practices, root
 trust managed by a body distinct from any commercial participant.
 
 The framework launches with a single issuer (the Liquid Media Foundation
-itself) and a public commitment to federate at a defined milestone
-of network maturity. Federation is therefore a visible commitment,
-not an indefinite promise.
+itself) and a public commitment to federate as the network matures.
+Honesty requires naming the gap: the specific trigger — a node count,
+device count, date, or maturity metric — is **not yet set**, and until
+it is published this is a commitment to federate, not a *defined*
+milestone. Fixing that number, together with the first-audit and
+admin-key-sunset milestones (§15), is itself a near-term deliverable;
+the intent is a visible, measurable trigger rather than an indefinite
+promise.
 
 ### 7.4 What Each Tier Provides — Access Control vs. Endpoint Protection {-}
 
@@ -544,7 +553,7 @@ measured robustness *parity* with those specific systems, which rest
 on SoC-integrated secure-video paths, protected memory, and certified
 provisioning refined over many years. Parity is a property to be
 *earned* through a published robustness specification and independent
-review (a forthcoming LMAP V6 deliverable, §7.2), not asserted. Until
+review (a forthcoming compliant-tier deliverable, §7.2), not asserted. Until
 then the honest claim is narrower and still substantial: a sealed
 direct player with a hardware secure element, a protected media path,
 and attested output — materially stronger than software-only access
@@ -1446,7 +1455,7 @@ no dependency on any centralized service. The daemon's operating
 behavior — IPFS fetch with local Kubo preference, automatic
 content pinning to make the Seed a provider, LAN-streaming via
 HTTP/mDNS with byte-range support — is documented as the
-canonical reference behavior for compliant Seeds. §7.2 (Compliant
+canonical reference behavior for conformant Seeds. §7.2 (Compliant
 Tier) gains a normative statement: hardware binding (SE-resident
 keypair generation, non-extractable private keys, in-SE key
 unwrapping, in-SE attestation signing) is a MUST for V6

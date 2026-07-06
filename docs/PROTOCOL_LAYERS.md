@@ -496,12 +496,13 @@ authority. Required for studio-licensed content. Revocable. Audited.
 
 **Certification authority structure:**
 - Foundation-only at v1 launch (single CA — Liquid Media Foundation)
-- Federation milestone: at a defined network size or maturity
-  threshold, the CA opens to additional signers (independent
-  auditors, integrator-channel certifiers, academic partners)
-- Federation is a *visible commitment*, not an indefinite
-  promise — a public sunset milestone for the LMF-only
-  phase
+- Federation milestone: at a network-size or maturity threshold
+  (**to be published; not yet set**), the CA opens to additional
+  signers (independent auditors, integrator-channel certifiers,
+  academic partners)
+- Federation is a *commitment*, not an indefinite promise — but until
+  the trigger number/date is published it is not yet a *defined*
+  milestone; fixing that number is a near-term deliverable
 
 ### 7.3 Both tiers run the same protocol
 
@@ -561,9 +562,12 @@ How the protocol evolves over time. Future work.
 
 - **Foundation entity.** Holds the protocol IP, governs upgrades,
   stewards the certification authority, and operates as the
-  protocol-neutral standards body. Legal structure under evaluation
-  (Cayman Foundation Company is the leading candidate; alternatives
-  include Swiss Stiftung and US 501(c)(3)).
+  protocol-neutral standards body. Legal structure: a **US 501(c)(6)
+  trade association** (modeled on the Wi-Fi Alliance, USB-IF, and HDMI
+  Forum), consistent with the whitepaper §15 and the README. (An
+  earlier draft floated a Cayman Foundation Company; that arrived with
+  the retired v3.0 token design and was discarded with it — see the
+  v2.4 changelog.)
 - **Federated certification.** Layer 5 attestation authorities
   beyond the Foundation, federated under a public governance process.
 - **Token holder voting (per title), bounded by immutability.** The
@@ -667,12 +671,15 @@ Decisions worth converging on:
    NXP SE050. Mature, attestable, $5-8/unit, well-supported tooling.
 2. **LAN streaming protocol.** Recommendation: HLS over HTTPS with
    mDNS discovery. No DLNA in v1.
-3. **Foundation legal structure.** Recommendation: Cayman Foundation
-   Company. Less expensive than Swiss Stiftung, well-established for
-   crypto-adjacent protocols.
+3. **Foundation legal structure.** Decision: **US 501(c)(6) trade
+   association** (Wi-Fi Alliance / USB-IF / HDMI Forum model),
+   consistent with whitepaper §15 and README. The earlier Cayman
+   Foundation Company recommendation was retired with the v3.0 token
+   design (v2.4 changelog).
 4. **Initial certification authority.** Recommendation:
    Foundation-only at v1, with a public commitment to federate at a
-   defined milestone.
+   network-maturity threshold that is *itself a near-term deliverable
+   to define and publish* (not yet set).
 5. **Watermarking provider engagement.** Initiate conversations with
    Verimatrix, NAGRA, Irdeto. Not blocking for v1; required for
    studio engagement.
