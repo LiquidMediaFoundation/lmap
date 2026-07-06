@@ -1,6 +1,6 @@
 # LMAP — Device Compliance & Access Control
 
-*Specification / design note. Drafted 2026-07-04. **Status: DRAFT for review.** Once settled, this drives updates to `PROTOCOL_LAYERS.md` §4.2–4.5, `PROTOCOL_POSITIONING.md` §7–8, and the whitepaper §7–9 (see §8). Working sections (§8–9) are editorial and are removed before publication.*
+*Specification / design note — the design-level companion to the canonical specifications (see §8 for how it maps to them). Published alongside whitepaper v2.6. §9 records the open design questions candidly, in keeping with the set's practice of naming what is not yet settled.*
 
 ---
 
@@ -138,11 +138,9 @@ Consistent with whitepaper §8: a **bound** copy plays **forever, offline**, reg
 
 No claim of "uncopyable" or "DRM-grade." Access control (ownership + binding) and endpoint protection (hardware) are never conflated.
 
-## 8. Updates this drives in canonical docs (editorial — remove before publication)
+## 8. Relationship to the canonical specifications
 
-**Status (2026-07-05): alignment complete through the third external review; pending publish.** The whitepaper (now v2.6), `PROTOCOL_LAYERS.md`, and `PROTOCOL_POSITIONING.md` have been brought into alignment across three rounds of Fable review (branch `access-control-v2.5`). Applied: Lit retired to a swappable interim bridge; "certified tier" → "compliant tier"; the binding model finalized (`boundCount`, on-chain fleet-written blinded-commitment registry, informs-never-gates, device self-audit, transfer-hook retired); compliant tier promoted to the launch mechanism; direct-player propagated, headless scoped to a secondary open-tier mode; trust claims tense-scoped; per-N and watermarking claims restated conditionally; carriage open; exhibition split into a distinct DCI-developed regime; §13 privacy re-derived; fee economics and governance/immutability reconciled; README and companions aligned; v2.6 delta changelog written.
-
-**Remaining before publication:** rebuild the PDF and update the wylloh.com link. *(External re-review is **done** — three Fable passes; the third's findings are all addressed. Note: the finalized blinded-commitment write model and the exhibition two-regime were designed in response to the third pass, following Fable's own recommended direction, and were not separately cold-read in final form — an optional targeted read, not a blocker. The terminology-rename pass is **done**: commit `f3a670e` plus the PL glossary.)*
+This note is the design-level companion to the canonical specifications; where it goes into more mechanism detail, those documents carry the normative statements. It drives and is kept in sync with: **whitepaper §7–9** (the two-tier access model, binding, the Seed network), **`PROTOCOL_LAYERS.md` §4.2–4.5** (Layer 2 cryptography and the binding registry) and **§7** (Layer 5 attestation), and **`PROTOCOL_POSITIONING.md` §7–8** (the two-tier posture). It reflects the access-control rework settled through three rounds of external review (whitepaper v2.6; see that changelog for the delta).
 
 ## 9. Open questions
 
