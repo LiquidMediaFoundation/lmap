@@ -34,9 +34,9 @@ different layers as long as the interfaces are honored.
 | 0 | Trust Anchors | Cryptographic primitives; hardware roots; wallet identity; contract immutability | Partial |
 | 1 | Storage | Content distribution substrate (IPFS, manifests) | Shipped (open tier) |
 | 2 | Cryptography | Encryption, key hierarchy, dispersal, watermarking | Shipped (open tier); spec'd (compliant tier) |
-| 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers | Shipped (V4.1 distribution); spec'd (V5 copyright) |
-| 4 | Network | Peer discovery, shard request/response, LAN streaming | Future (V2 Seed architecture) |
-| 5 | Attestation | Open tier / compliant tier hardware attestation | Spec'd; not yet implemented |
+| 3 | Entitlement | Smart contracts: distribution + copyright registries, royalties, rights tiers | Shipped (V4.1 distribution); spec'd (V6 copyright) |
+| 4 | Network | Peer discovery, shard request/response, LAN streaming | Partial: reference daemon serves open-tier LAN (HTTP byte-range + mDNS) today; peer protocol + HLS transport spec'd/future |
+| 5 | Attestation | Compliant-tier hardware attestation (the open tier requires none) | Spec'd; not yet implemented |
 | 6 | Application | Storefronts, library UI, playback clients, integrator tooling | Shipped (web client); future (TV/mobile) |
 | 7 | Governance | Foundation structure; federated certification; protocol governance | Future |
 
@@ -392,10 +392,12 @@ Polygon mainnet, immutable, and verified.
 ## 6. Layer 4 — Network
 
 Peer-to-peer protocol between Seeds, plus LAN streaming to playback
-apps. Future work — depends on the V2 Seed reference implementation
-shipping.
+apps. Mixed status: the **Seed-to-Seed peer protocol** is future work
+(depends on the V2 Seed reference implementation), while **open-tier
+LAN streaming already ships** in the reference daemon — see the
+transport note below.
 
-**Components (all spec'd, not yet implemented):**
+**Peer-protocol components (spec'd, not yet implemented):**
 
 - **Seed peer discovery and gossip protocol.** Seeds announce their
   presence on a public registry (DHT-based) for shard exchange.
@@ -414,7 +416,15 @@ plays on the sealed direct player itself (Layer 5); LAN streaming to
 companion apps and personal devices is an **open-tier** capability
 that trades endpoint protection for reach:
 
-- **HLS over HTTPS** as the open-tier client-Seed protocol
+- **Transport, shipped vs. target.** The reference daemon today serves
+  open-tier LAN over **HTTP byte-range** with mDNS discovery — the
+  demonstrated, canonical reference behavior (whitepaper §9). **HLS over
+  HTTPS** is the *specified target* transport for broad companion-client
+  support (Roku, Apple TV, iOS/iPadOS, browsers all natively support
+  HLS); it is not yet implemented in the reference. Until it is, HTTP
+  byte-range is the normative shipped behavior and HLS is the roadmap
+  target — an implementer should build to byte-range today and track
+  the HLS transition.
 - mDNS / Bonjour for Seed discovery on the LAN
 - TLS with self-signed cert pinned at pairing time
 - Roku, Apple TV, iOS/iPadOS, and web browsers all natively support
