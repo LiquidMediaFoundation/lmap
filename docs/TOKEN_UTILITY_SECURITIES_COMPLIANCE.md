@@ -83,9 +83,11 @@ ownership of copies, license to view, license to exhibit. Materials
 avoid investment-register framing.
 
 A secondary market does exist — tokens are transferable ERC-1155
-balances and can be resold. The filmmaker receives the same 97.5/
-2.5 split on secondary sales (royalty enforcement at the registry
-level). The protocol acknowledges secondary markets exist; it does
+balances and can be resold. On secondary sales the same split
+applies: the protocol takes a flat 2.5% and the remaining 97.5%
+flows to the rights-holder side (the author, plus any publisher fee
+set at mint — see whitepaper §10.1), enforced at the registry level.
+The protocol acknowledges secondary markets exist; it does
 not promote them as a return mechanism, and the protocol's stated
 purpose (per the whitepaper) is distribution and ownership of
 films, not appreciation of digital assets.
