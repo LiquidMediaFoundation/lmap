@@ -984,14 +984,29 @@ required.
 Commercial exhibition requires tokens to be staked for the exhibition
 period. The professional distribution system verifies on-chain that
 staked tokens meet the exhibition threshold before enabling playback.
-This prevents the exploitation pattern of acquiring tokens, screening
-content, and immediately selling. Staking creates commitment aligned
-with legitimate commercial use.
+This is a **deliberately different regime from personal viewing, on
+the same fungible token.** A personal copy binds and plays offline
+forever, its playback never checking ownership (§7.2, §8) — correct,
+because the residual it leaves is one personal copy. Exhibition
+enforcement is the opposite by design: playback is **license-checked
+live**, because a bound-and-abandoned *exhibition* copy would retain a
+whole commercial rights package, not a personal one. The live check is
+therefore not a violation of the personal tier's "playback never
+checks" rule; it scopes that rule to personal copies and treats a
+venue as what it is — a **licensee**, for which live license
+enforcement is the historical norm. One token, two unlocks; and the
+liquidity flows between them — a collector's tokens can aggregate into
+a venue's exhibition stake, giving a sleeper film its theatrical run
+*after* it has already circulated digitally, then disperse back to
+collectors.
 
-*Implementation status:* design intent. Stacking thresholds are
-operational at the contract level today; the staking mechanism for
-commercial-exhibition windows is specified for a future protocol
-version.
+*Implementation status:* design intent, **forthcoming** — the launch
+focus is home viewing. Stacking thresholds are operational at the
+contract level today; the staking mechanism, the live exhibition-time
+license check, and the tier-accounting for commercial-exhibition
+windows are specified for a future protocol version (the two-regime
+decision is settled; the wire-level protocol is not — see the device
+compliance note §2.1).
 
 ## 12. Production Funding {-}
 
