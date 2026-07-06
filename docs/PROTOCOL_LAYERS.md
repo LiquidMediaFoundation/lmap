@@ -221,10 +221,21 @@ forensic-grade attribution is required:
   unit, so binding is a **count per `(wallet, tokenId)`** — `boundCount`,
   under `boundCount ≤ balance` (transferable = `balance − boundCount`) —
   *not* a per-token flag. The count lives in an **on-chain,
-  world-readable binding registry from launch**; the key issuer
-  (§glossary) is its sole writer at launch, and what decentralizes over
-  time is *who may write it* (single issuer → federated → threshold),
-  never a transfer veto. The token stays a plain ERC-1155 throughout.
+  world-readable binding registry from launch** — a separate accounting
+  contract. **Only a compliant player can write the flag:** a bind or
+  release is accepted only when it carries a valid, non-revoked
+  compliant-device attestation plus the owner's wallet signature, and
+  the registry contract enforces `boundCount ≤ balance` at write time
+  by reading the token's `balanceOf`. No central issuer writes the
+  flag — the attested fleet does, from launch, so no single party can
+  withhold a release; the only non-device writer is the wallet owner,
+  who forces a recovery-release after the report window. The key issuer
+  (§glossary) is confined to *key wrapping*, separate from flag state.
+  (Registry writes verify a device credential on-chain against the
+  Layer 3 recognized-roots / revocation registry — a real gas and
+  engineering cost, called out as an implementation item.) The token
+  stays a plain ERC-1155 throughout, and the registry is a distinct
+  contract that never touches the token's transfers.
   **The registry informs; it never gates:** the token transfers freely
   on-chain at all times and the protocol lets no party — issuer
   included — block the exchange of an owned token. A bound copy plays

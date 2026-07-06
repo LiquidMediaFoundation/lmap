@@ -410,14 +410,24 @@ distinguishable "the token" to flag; binding is tracked instead as a
 **count per `(wallet, tokenId)`** — `boundCount` — under the invariant
 `boundCount ≤ balance`, so a wallet's transferable units are
 `balance − boundCount`. This count lives in an **on-chain binding
-registry from launch**: world-readable, so any platform, wallet, or
-prospective buyer can verify a unit's released status without trusting
-a private ledger. At launch the issuer is the registry's sole
-writer — it increments on bind and decrements on an attested
-release — and what decentralizes over time is *who may write it*
-(single issuer → federated anchors → threshold network), never the
-addition of a transfer veto. The token itself remains a plain ERC-1155
-throughout, so tokens minted at launch carry forward unchanged.
+registry from launch**: a separate, world-readable accounting
+contract, so any platform, wallet, or prospective buyer can verify a
+unit's released status without trusting a private ledger. **Only a
+compliant player can set the flag.** A bind or release is recorded
+only when it carries a valid, non-revoked compliant-device
+attestation authorizing that specific operation, together with the
+owner's wallet signature; the registry contract enforces
+`boundCount ≤ balance` at write time by reading the token's on-chain
+balance. No central issuer writes the flag — the attested fleet does,
+from launch — so no single party can withhold a release. The only
+non-device writer is the wallet owner, who may force a recovery-release
+after the report window (wallet-authoritative; a device can never veto
+its owner). The issuer's remaining role is confined to *key
+wrapping* — enabling decryption at first bind — which is separate from
+flag state and decentralizes on its own path (§7.3). The entitling
+token remains a plain ERC-1155 throughout, and the registry is a
+distinct contract that never touches the token's transfers, so tokens
+minted at launch carry forward unchanged.
 
 **The registry informs; it never gates.** The entitling token
 transfers freely on-chain at all times — a gift, an inheritance, or a
@@ -1291,10 +1301,10 @@ of this paper's publication:
   presale-funding milestone-escrow contracts; threshold dispersal of
   ciphertext shards; **federation of the attestation issuer and
   decentralization of the compliant-tier key service from single →
-  federated → threshold** (§7.3), which also decentralizes *who may
-  write* the on-chain binding registry (§7.2). The registry itself is
-  a launch component, not a future one; the protocol adds no
-  transfer-veto — exchange stays free by design.
+  federated → threshold** (§7.3). The on-chain binding registry (§7.2)
+  is itself a launch component, written by the attested player fleet
+  (no central flag-writer); the protocol adds no transfer-veto —
+  exchange stays free by design.
 - **Long-horizon (operational maturity required):** studio-grade
   compliant-tier engagement with major rights holders.
 
@@ -1321,14 +1331,17 @@ the tier by the open conformance standard a device meets rather than
 by an authority's grant. (3) **A binding model is added to the
 compliant tier (§7.2).** Per-device wrapping now tracks binding as a
 `boundCount` per `(wallet, tokenId)`, recorded in an **on-chain,
-world-readable binding registry from launch** (issuer-written; the
-token stays a plain ERC-1155): a copy binds to one secure element at a
-time, plays offline indefinitely, and is *released* — the device
-deletes its wrapped key — before a unit trades without residual. The
-registry *informs* rather than *gates*: the token transfers freely
-on-chain at all times, the protocol lets no party block exchange, and
-scarcity for safe trade comes from platforms honoring the flag plus
-opt-in escrow that settles atomically against it. An owner-signed
+world-readable binding registry from launch** — a separate accounting
+contract written by the attested compliant-player fleet (only a
+compliant device, authorized by the owner's wallet, can set the flag;
+no central issuer writes it; the token stays a plain ERC-1155): a copy
+binds to one secure element at a time, plays offline indefinitely, and
+is *released* — the device deletes its wrapped key — before a unit
+trades without residual. The registry *informs* rather than *gates*:
+the token transfers freely on-chain at all times, the protocol lets no
+party block exchange, and scarcity for safe trade comes from platforms
+honoring the flag plus opt-in escrow that settles atomically against
+it. An owner-signed
 report releases a lost device's titles after a 30-day window (no
 presence beacon), with transaction-gated erasure. This restores
 one-copy-per-token scarcity for honest trade, and with it collectible
