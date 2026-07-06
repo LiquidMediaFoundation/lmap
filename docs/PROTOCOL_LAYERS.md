@@ -353,9 +353,17 @@ Polygon mainnet, immutable, and verified.
 - **Stacking thresholds for rights tiers** (shipped). Per-token
   metadata defines stacking thresholds for personal viewing, small
   venue, theatrical exhibition. Enforcement is on-chain.
-- **Royalty splits** (shipped). 2.5% protocol fee hardcoded;
-  filmmaker receives 97.5%. Splits payable on every primary and
-  secondary-market transaction routed through the protocol contract.
+- **Royalty splits** (shipped for V4.1; extended in V5). The **2.5%
+  protocol fee is the constant** — hardcoded, identical on every sale
+  through any marketplace. In the shipped **V4.1 two-way** split the
+  author receives the whole remaining 97.5%. **V5** adds a **variable
+  publisher fee (0–25%), set by the minting platform at mint**
+  (whitepaper §10.1): it comes *out of* the 97.5%, so the author
+  receives the remainder (72.5%–97.5%), and a self-minting author keeps
+  the full 97.5%. Either way the protocol's cut stays a flat 2.5%; the
+  platform's cut is the variable. Splits are payable on every primary
+  and secondary-market transaction routed through the protocol
+  contract.
 - **ERC-721 copyright registry** (spec'd, not deployed). Future **V6**
   contract for representing copyright ownership (ERC-721) separately
   from distribution rights (ERC-1155). Mirrors how rights actually
