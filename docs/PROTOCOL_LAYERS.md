@@ -225,39 +225,47 @@ protection or forensic-grade attribution is required:
   under `boundCount ≤ balance` (transferable = `balance − boundCount`) —
   *not* a per-token flag. The count lives in an **on-chain,
   world-readable binding registry from launch** — a separate accounting
-  contract. **Only a compliant player can write the flag:** a bind or
-  release is accepted only when it carries a valid, non-revoked
-  compliant-device attestation plus the owner's wallet signature, and
-  the registry contract enforces `boundCount ≤ balance` at write time
-  by reading the token's `balanceOf`. No central issuer writes the
-  flag — the attested fleet does, from launch, so no single party can
-  withhold a release; the only non-device writer is the wallet owner,
-  who forces a recovery-release after the report window. The key issuer
+  contract. **Writes follow a blinded-commitment rule.** A **bind**
+  requires a valid, non-revoked compliant-device credential *and* the
+  owner's wallet signature, records a **blinded commitment**
+  `C = hash(secret)` (never device identity), and the contract enforces
+  `boundCount ≤ balance` against `balanceOf`. A **release** is
+  authorized by *opening* that commitment (revealing the secret),
+  proving the writer bound this unit — so it needs no wallet signature
+  and exposes no device identity, and the **device self-audit** can
+  release a sold copy on its own (the departed wallet cannot co-sign).
+  The on-chain check is an enrolled device-key signature plus
+  non-revocation (not a fresh attestation report); the reference secure
+  elements sign P-256, verifiable cheaply via Polygon's **RIP-7212**
+  precompile — an implementation item. No central issuer writes the
+  flag — the attested fleet does, from launch. The one
+  wallet-authoritative write is **recovery**: after the report window
+  the owner force-releases their own `(wallet, tokenId)` units directly
+  (owner-enumerated; no device→title map). A single party can *delay* a
+  release by revoking a device (pushing the holder onto recovery), not
+  *withhold* it — recovery is wallet-authoritative. The key issuer
   (§glossary) is confined to *key wrapping*, separate from flag state.
-  (Registry writes verify a device credential on-chain against the
-  Layer 3 recognized-roots / revocation registry — a real gas and
-  engineering cost, called out as an implementation item.) The token
-  stays a plain ERC-1155 throughout, and the registry is a distinct
-  contract that never touches the token's transfers.
+  The token stays a plain ERC-1155 throughout, and the registry is a
+  distinct contract that never touches transfers.
   **The registry informs; it never gates:** the token transfers freely
-  on-chain at all times and the protocol lets no party — issuer
-  included — block the exchange of an owned token. A bound copy plays
-  offline indefinitely (the binding is recorded, never re-verified). To
-  trade without residual the holder *releases* a unit (the device
-  deletes its wrapped key and attests the deletion; `boundCount`
-  decrements); an escrow contract can settle a sale atomically against
-  the registry so a buyer transacting through it never acquires a unit
-  whose copy is bound elsewhere, and a platform may list only released
+  on-chain at all times and no party — issuer included — can block the
+  exchange of an owned token. A bound copy plays offline indefinitely
+  (recorded, never re-verified). To trade without residual the holder
+  *releases* (opens the commitment; `boundCount` decrements); an escrow
+  contract can settle a sale atomically against the registry so a buyer
+  never acquires a bound unit, and a platform may list only released
   units or warn on the rest — coordination built on the flag, not
-  enforced by fiat. A lost, sold, or broken device is recovered
-  by an owner-signed **report** that releases its titles after a
-  30-day window (no heartbeat or presence beacon); the device
-  verifiably erases them as a precondition of its next transaction,
-  and a refusing device is revoked. Playback of already-bound content
-  fails open. This yields one-copy-per-token scarcity with no
-  continuous ownership check — enforcement only at binding and
-  release. Residual (a compromised device reporting `released` while
-  retaining its copy) is bounded and forensically watermarked (§4.4).
+  enforced by fiat. A lost/sold/broken device is recovered by the
+  owner-enumerated report + 30-day release (no heartbeat or beacon);
+  the device verifiably erases recovered titles as a precondition of
+  its next capability-acquiring transaction, and a refusing device is
+  revoked. Playback of already-bound content fails open. This yields
+  one-copy-per-token scarcity with no continuous ownership check —
+  enforcement only at bind and release. **Two residuals** remain, both
+  physical-media-tier and (for attribution) conditional on a measured
+  watermark scheme (§4.4): a compromised device that opens `released`
+  while retaining its copy, and a raw out-of-escrow transfer that
+  momentarily leaves `boundCount > balance`.
 
 ### 4.4 Watermarking (scheme and provider open — dependent claims are conditional)
 

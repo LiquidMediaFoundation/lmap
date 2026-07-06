@@ -436,22 +436,33 @@ distinguishable "the token" to flag; binding is tracked instead as a
 `balance − boundCount`. This count lives in an **on-chain binding
 registry from launch**: a separate, world-readable accounting
 contract, so any platform, wallet, or prospective buyer can verify a
-unit's released status without trusting a private ledger. **Only a
-compliant player can set the flag.** A bind or release is recorded
-only when it carries a valid, non-revoked compliant-device
-attestation authorizing that specific operation, together with the
-owner's wallet signature; the registry contract enforces
-`boundCount ≤ balance` at write time by reading the token's on-chain
-balance. No central issuer writes the flag — the attested fleet does,
-from launch — so no single party can withhold a release. The only
-non-device writer is the wallet owner, who may force a recovery-release
-after the report window (wallet-authoritative; a device can never veto
-its owner). The issuer's remaining role is confined to *key
-wrapping* — enabling decryption at first bind — which is separate from
-flag state and decentralizes on its own path (§7.3). The entitling
-token remains a plain ERC-1155 throughout, and the registry is a
-distinct contract that never touches the token's transfers, so tokens
-minted at launch carry forward unchanged.
+unit's released status without trusting a private ledger. **Only the
+player that bound a copy can release it — without revealing which
+device it is.** A **bind** is recorded only when it carries a valid,
+non-revoked compliant-device attestation *and* the owner's wallet
+signature, and the registry enforces `boundCount ≤ balance` by reading
+the token's on-chain balance. The write stores a **blinded binding
+commitment** — the hash of a fresh secret the device holds — *not* the
+device's identity. A **release** is then authorized by *opening that
+commitment* (revealing the secret): opening proves the writer is the
+very device that bound, so it needs no wallet signature and exposes no
+device identity. This is what lets the **device self-audit release a
+copy the wallet has sold** — the departed wallet need not co-sign, and
+no observer learns which player held it. No central issuer writes the
+flag; the attested fleet does, from launch, and the contract enforces
+the invariant. The one wallet-authoritative write is **recovery**:
+after the report window, the owner force-releases their *own*
+`(wallet, tokenId)` units directly — the registry is indexed by
+wallet, so the owner enumerates their own titles and a lost device
+need never appear. A single party *can* delay a release by revoking a
+device's write capability, pushing that holder onto the recovery path;
+it *cannot* prevent one, precisely because recovery is
+wallet-authoritative. The issuer's remaining role is confined to *key
+wrapping* — enabling decryption at first bind — separate from flag
+state and decentralizing on its own path (§7.3). The token remains a
+plain ERC-1155 throughout, and the registry is a distinct contract
+that never touches transfers, so tokens minted at launch carry forward
+unchanged.
 
 **The registry informs; it never gates.** The entitling token
 transfers freely on-chain at all times — a gift, an inheritance, or a
@@ -1021,20 +1032,35 @@ The conventional streaming model links user identity to viewing
 history to platform to advertisers, forming a chain of surveillance
 maintained primarily for monetization through inferred consumer
 preferences. The protocol model maintains pseudonymous wallets
-executing public transactions on a transparent ledger, with no link
-to real-world identity, no telemetry from playback events, and no
-viewing patterns aggregated by any party. This holds in the compliant
-tier as well: a bound player contacts the network only at
-owner-initiated transactions (register, bind, release, report),
-never with an ambient presence signal, so recovery is
-report-triggered rather than surveillance-detected. The issuer learns
-*acquisition* events — which on-chain ownership already largely
-reveals — but never *when* or *how often* a holder watches;
-oblivious issuance, in which the issuer does not learn the title, is
-a specified future privacy enhancement. Creators receive
-aggregate insights — token distribution by region inferred from
-public data, secondary-market activity, holder concentration —
-without compromising individual privacy.
+executing public transactions on a transparent ledger, with **no
+telemetry from playback events and no viewing patterns aggregated by
+any party** — *movies never watch their viewers*, the claim the
+protocol enforces absolutely: playback is a local operation that
+contacts nothing (§8), in the compliant tier as much as the open one
+(a bound player never emits a presence signal, so recovery is
+report-triggered, not surveillance-detected).
+
+What the protocol does **not** promise is anonymity of *ownership*,
+and it is honest about the difference. Ownership and transfers are
+public by design; so is the binding registry (§7.2), which records
+**bind and release events per `(wallet, tokenId)` with timestamps** — a
+public account of which wallets acquired copies of which titles and
+when, and of the transferability lifecycle. The registry is
+deliberately built to expose *no more* than that: binding commitments
+are **blinded**, so **device identity never appears on-chain** and the
+wallets sharing a household player are not linked through it; and
+nothing in it records *viewing*. Pseudonymity is also not
+unlinkability — a wallet funded through a KYC'd fiat ramp, or
+correlated by chain analysis, can be tied to a real person by a
+determined party; the protocol's guarantee is the absence of a
+*viewing*-surveillance chain, not the impossibility of deanonymizing a
+public ledger. The issuer learns *acquisition* events — which on-chain
+ownership already largely reveals — but never *when* or *how often* a
+holder watches; oblivious issuance, in which the issuer does not learn
+the title, is a specified future privacy enhancement. Creators receive
+aggregate insights — token distribution by region inferred from public
+data, secondary-market activity, holder concentration — without
+compromising individual *viewing* privacy.
 
 ## 14. Security Philosophy {-}
 
