@@ -1409,7 +1409,12 @@ of this paper's publication:
   is the production access-control mechanism. Scaffold with
   passing tests; full marketplace implementation, comprehensive
   test coverage, and deployment under foundation governance are
-  2026 milestones.
+  2026 milestones. **Not yet in the V5 feature set** (it predates the
+  binding model): the **binding registry** contract and the
+  **binding-aware escrow/settlement** path (§7.2) — the compliant
+  tier's buyer guarantee reads against these; they are launch-critical
+  interfaces still to be specified, tracked with the attestation flow
+  below rather than assumed complete in V5.
 - **Specified, in implementation (hardware, clients, and the
   compliant tier):** the reference Seed device (the *Origin*), a
   sealed direct player; its native client applications for open-tier

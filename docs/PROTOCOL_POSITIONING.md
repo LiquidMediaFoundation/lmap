@@ -3,14 +3,17 @@
 > A living document on what LMAP is, what it isn't, and how it
 > relates to the clients, hardware, and marketplaces that build on it.
 >
-> **Status:** Living document — **v2.5 rework in progress (July 2026).**
-> Where any statement here conflicts with the whitepaper (v2.5),
-> `PROTOCOL_LAYERS.md`, or `DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`,
-> **those are canonical** and this doc is stale pending its pass. Known
-> stragglers being corrected: the §7 tier table (compliant tier is the
-> *day-1 launch* mechanism, not long-horizon; open-tier encryption is
-> threshold-mediated key release, not the retired public-data
-> derivation), the §8 feature list, and license/positioning lines.
+> **Status:** Living document — **aligned to whitepaper v2.5 (July
+> 2026); pending external re-review.** The whitepaper (v2.5),
+> `PROTOCOL_LAYERS.md`, and `DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`
+> remain canonical for engineering detail; this doc carries the
+> strategic and positioning framing. A full v2.5 alignment pass has
+> been applied: sealed direct-player as the primary surface, the
+> compliant tier as the day-1 (Seed-gated) launch mechanism, the
+> on-chain binding registry that *informs but never gates*, the
+> threshold-released open tier (legacy public-data derivation retired),
+> 97.5%-of-list-price economics, Foundation-board governance, and
+> Apache-2.0.
 >
 > Opening sections are written to potentially become web copy. Later
 > sections go deeper.
@@ -134,12 +137,27 @@ independent-majority board, *not* a protocol-token holder vote (v2.4
 removed the token concept) — bootstrapped by the founding team and
 federating to that board over time.
 
-**Of every sale, 97.5% goes to the rights holder — regardless of
-which marketplace the sale happens through** (the protocol takes only
-2.5%). A self-publishing filmmaker keeps the full 97.5%; where a
-publisher is involved, that 97.5% splits between publisher and author
-on terms they set (whitepaper §10.1). It never leaves the people who
-made and released the film for a platform.
+**The one constant is the protocol's 2.5%.** It is the same on every
+sale, through any marketplace, and cannot be waived per-sale. The
+other **97.5% stays on the rights-holder side** — but how it divides
+depends on how the film was minted, and that part is *variable*:
+
+- **Self-minted:** the filmmaker is the publisher and keeps the full
+  97.5%.
+- **Minted through a publishing platform:** that platform sets a
+  **publisher fee — 0–25%, variable, chosen by the minting platform at
+  mint** — which comes *out of* the 97.5%; the author receives the
+  remainder (as low as 72.5%). The fee is fixed for that title once
+  minted and disclosed up front (whitepaper §10.1).
+
+So "97.5%" is the rights-holder-side total after the protocol's flat
+cut — *not* a flat number the filmmaker always pockets; the publisher
+fee is the variable, set by the minting platform. Separately, a
+third-party marketplace *reselling* a title may add its own markup
+*on top* of the list price — paid by the buyer as the cost of that
+marketplace's service — but it cannot reach into the 97.5%. The
+rights-holder share never leaves the people who made and released the
+film for a platform.
 
 ---
 
@@ -160,8 +178,16 @@ indiemarket.tv:    $5.49  ($0.12 protocol fee, $0.50 marketplace,
                            $4.87 to filmmaker)
 ```
 
-The filmmaker's share is identical. The marketplace competes on
-service, not on undercutting the protocol.
+The rights holder's share is identical. The marketplace competes on
+service, not on undercutting the protocol. The honest reading: the
+rights-holder side receives 97.5% of the *list price* set ($4.87 of
+$4.99) in both cases; indiemarket's $0.50 is a markup added *on top*,
+so the buyer pays $5.49 while the rights-holder take is untouched.
+"97.5%" is of the list price — not of whatever a marketplace chooses
+to charge above it. (This example is self-published, so the filmmaker
+*is* the rights holder and keeps the full $4.87; had it been minted
+through a publishing platform, that platform's variable fee would
+split the $4.87 per §3 — the protocol's 2.5% is the only constant.)
 
 This makes LMAP valuable to other marketplaces: we are their shared
 plumbing, not their rival. A film minted on LMAP is portable to any
@@ -179,7 +205,7 @@ and how hard extraction is.
 | Client | Download | At rest | Extraction resistance |
 |---|---|---|---|
 | **wylloh.com (browser)** | Encrypted → streaming decrypt in memory → plaintext MP4 to Downloads folder | Plaintext | None, by design |
-| **Wylloh Seed** (sealed direct player) | Encrypted → decrypts inside the sealed player → displayed on its own output | Encrypted, hardware-bound | Strong (compliant tier) |
+| **Wylloh Seed** (sealed direct player) | Encrypted → decrypts inside the sealed player → displayed on its own output | Encrypted, hardware-bound | Strong (compliant tier; measured robustness parity with commercial DRM is a property to be earned, not yet asserted — WP §7.4) |
 | **Wylloh Roku / Apple TV / iOS app** | Open-tier LAN streaming from a paired Seed; phone-as-remote | No persistent local copy | Open-tier only (not the compliant path) |
 | **Third-party clients** | Client's choice | Client's choice | Client's choice |
 
@@ -199,23 +225,31 @@ Each serves a different use case:
 
 See `docs/seed-one/ARCHITECTURE.md` for the Seed architecture (sealed
 direct player; companion client apps serve open-tier LAN streaming
-and phone-as-remote).
+and phone-as-remote). *(Internal reference — not yet published in this
+repository.)*
 
 ---
 
-## 6. Native apps — the surface where users live
+## 6. The player is the surface; the apps extend it
 
-Branded Wylloh client apps for Roku, Apple TV, and iOS are a core
-part of the V2 Seed architecture, not optional add-ons. They are how
-users actually meet a Seed in their living room.
+The **sealed direct player** is the primary living-room surface: it
+connects to the TV and renders compliant-tier content on its own
+output — the only place endpoint protection is coherent (whitepaper
+§9). Branded Wylloh **companion apps** for Roku, Apple TV, and iOS are
+secondary clients: they serve *open-tier* LAN streaming to other rooms
+and act as phone-as-remote, reaching devices users already own. They
+are a meaningful part of the experience — but never the path for
+compliant-tier premium content, which plays on the sealed player
+alone.
 
-The order of build:
+The order of build (companion apps):
 1. **Roku app** — lowest dev friction, biggest US TV install base
 2. **Apple TV app** — premium UX expectations, brand alignment
-3. **iOS app** — phone-as-remote, take-with-you offline mode
+3. **iOS app** — phone-as-remote and open-tier LAN streaming
 4. **Android TV / Fire TV / smart TV native apps** — later
 
-Each app is a thin client over the Seed's LAN-served Wylloh API.
+Each companion app is a thin client over the Seed's LAN-served Wylloh
+API.
 The Wylloh brand shows up in typography, in the curatorial-shelf
 metaphor, in moments of warmth — but the navigation, remote bindings,
 and platform-native gestures all belong to the host platform. We
@@ -256,17 +290,24 @@ independence rests not on that permeability but on its open
 specification, on-chain ownership, and permissionless implementations
 — no single company's servers in the path.
 
-**Compliant tier.** Seeds carrying hardware attestations from a
-federated certification authority. Required for studio-licensed
-content. Revocable. Audited. Content keys are wrapped per-device,
-unwrappable only inside the Seed's secure element. Compromising one
-compliant Seed yields *that Seed's local content only* — a constant
-per-compromise bound, with no catalog-scale master secret. (Per-title
-leak probability still grows with holder count; that residual is
-bounded by watermark attribution and revocation, not cryptography —
-see whitepaper §7.4.) This is the load-bearing security claim that
-makes credible studio engagement possible without breaking the
-protocol's openness.
+**Compliant tier.** Seeds carrying hardware attestations from the
+Foundation's certification authority (single at launch, federating
+over time). This is the **day-1 launch mechanism** for premium /
+endpoint-protection-required content — the flagship first release is
+Seed-gated and rides this tier — and the same certification path
+extends to studio-licensed content as a long-horizon step. Revocable.
+Audited. Content keys are wrapped per-device, unwrappable only inside
+the Seed's secure element. Compromising one compliant Seed yields
+*that Seed's local content only* — a constant per-compromise bound,
+with no catalog-scale master secret. (Per-title leak probability still
+grows with holder count; that residual is bounded by watermark
+attribution and revocation, not cryptography — and that bound is
+itself *conditional* on integrating a measured watermark scheme; see
+whitepaper §7.4–§7.5.) This constant-per-compromise property is what
+makes credible premium and studio engagement possible without breaking
+the protocol's openness; measured robustness *parity* with commercial
+DRM is a property to be earned through a published robustness
+specification and independent review, not asserted (whitepaper §7.4).
 
 **Both tiers run the same protocol.** A user's library aggregates
 content from both tiers under one unified interface. Storefronts can
@@ -283,32 +324,40 @@ narrow: hardware attestation for premium content keys.
 
 **The critical invariant: the ownership token is always yours to
 move.** The token is provably owned on-chain and is the license
-itself. In the compliant tier, binding adds one honest step — a bound
-unit is *released* (its copy erased) before it transfers, so
-`transferable = balance − boundCount` — but the token is never
-trapped: a holder can always release and move it. Attestation governs
-what a device may do with decrypted frames, and binding governs how
-many live copies a wallet runs at once; neither can prevent a wallet
-from *holding* or *transferring* the token it owns.
+itself, and it **transfers freely at all times** — the binding
+registry *informs, it never gates*. In the compliant tier a bound unit
+is normally *released* (its copy erased) before it **trades without
+residual**, so `transferable = balance − boundCount`; but that is a
+norm for clean trade, not a lock on transfer — a holder can always move
+the token (a raw out-of-escrow move just leaves a watermarked,
+physical-media-tier residual). Attestation governs what a device may do
+with decrypted frames, and binding governs how many live copies a
+wallet runs at once; neither can prevent a wallet from *holding* or
+*transferring* the token it owns.
 
-The two-tier model is the layered story that lets LMAP start with
-permissive indie content (where the open tier is sufficient and
-aligns with the trust philosophy) and graduate to studio relationships
-(where compliant-tier hardware attestation satisfies industry
-contractual norms) without touching the protocol or the token model.
-It is not a compromise of the sovereignty thesis — it is the
-sovereignty thesis surviving contact with industry reality.
+The two-tier model is the layered story that lets LMAP serve both
+permissive indie content (the open tier — sufficient, and aligned with
+the trust philosophy) and premium content (the compliant tier) from
+day one, with major-studio licensing a natural long-horizon extension
+of the same certification mechanism. The flagship first release leads
+with the compliant tier (Seed-gated); none of it touches the protocol
+or the token model. It is not a compromise of the sovereignty
+thesis — it is the sovereignty thesis surviving contact with industry
+reality.
 
 For VC framing: this is engineering maturity, not weakness.
-*"We chose the simplest possible encryption to validate the protocol
-with permissive content. Hardware-attested certification is a known
-engineering project we'll execute when studio relationships warrant
-it."*
+*"The open tier gives us honest access control for permissive content
+today; the compliant tier — attested per-device binding on a sealed
+player — is the launch mechanism for premium content, and the same
+certification path extends to studio licensing when those
+relationships warrant it. We are not retrofitting DRM; endpoint
+protection is a scoped, known engineering deliverable we are executing
+now."*
 
 See `docs/PROTOCOL_LAYERS.md` §7 for the technical detail of the
-attestation layer, and `docs/seed-one/ARCHITECTURE.md` for how the
-reference Seed supports both tiers via firmware updates without
-hardware changes.
+attestation layer, and `docs/seed-one/ARCHITECTURE.md` *(internal —
+not yet published in this repository)* for how the reference Seed
+supports both tiers via firmware updates without hardware changes.
 
 ---
 
@@ -320,7 +369,7 @@ by commercial entities under their own terms. This is the same
 posture that lets Filecoin be a protocol distinct from Protocol Labs,
 or Ethereum a protocol distinct from any single Ethereum company.
 
-**Open and permissionless** (MIT or Apache-2.0):
+**Open and permissionless** (Apache-2.0):
 - Reading the registry (query any film, any balance, from any RPC)
 - The IPFS file format (chunked AES-GCM, documented in
   `PROTOCOL_LAYERS.md` §4)
@@ -355,11 +404,12 @@ or Ethereum a protocol distinct from any single Ethereum company.
   (reverse-osmosis through protocol / platform / community). This
   deserves its own doc (future `CURATION.md`).
 - **How filmmakers mint today.** Contact the founding team.
-- **Compliant-tier content key issuance.** Once the compliant tier
-  ships, content key wrapping for studio-licensed material is gated
-  by hardware attestation (Layer 5). The certification authority is
-  LMF-only at v1, with a public commitment to federate
-  at a defined milestone.
+- **Compliant-tier content key issuance.** The compliant tier is the
+  day-1 launch mechanism; content-key wrapping for premium material is
+  gated by hardware attestation (Layer 5). The certification authority
+  is LMF-only at launch, with a public commitment to federate at a
+  network-maturity threshold that is itself a near-term deliverable to
+  define and publish (not yet set).
 
 **Commercial products built on top of the protocol** (operated under
 their own commercial terms):
@@ -412,7 +462,12 @@ Filecoin/Protocol Labs structure.
 
 If you tokenize a film on LMAP:
 
-- You keep 97.5% of every sale, forever, regardless of marketplace
+- The protocol takes a flat 2.5%, forever, on every sale through any
+  marketplace; the other 97.5% stays on your side. If you self-mint you
+  are the publisher and keep the whole 97.5%; if you release through a
+  publishing platform, its fee (0–25%, set at mint) comes out of that
+  97.5% and you keep the remainder. A reselling marketplace's markup
+  rides *on top*, paid by the buyer — never subtracted from your share.
 - Your film is portable to any LMAP-compatible marketplace
 - Your audience can buy it on wylloh.com, a third-party marketplace,
   or directly from a Seed you host yourself
@@ -432,7 +487,10 @@ protocol is the common layer. Everything else is a surface.
 
 - **Governance of the protocol fee.** The 2.5% is immutable today,
   routed to a treasury stewarded by the founding team. Long-term, it
-  should move to holder governance. That's a separate doc.
+  moves to the **Liquid Media Foundation's independent-majority board**
+  — *not* a protocol-token holder vote (the v2.4 design removed the
+  token concept; see §3). The federation timeline for that transition
+  is a near-term deliverable to define.
 - **Native apps priority.** Build mobile/desktop in 2027? Later?
   Never? Depends on Seed adoption curve and third-party client
   appetite.
@@ -451,10 +509,11 @@ protocol is the common layer. Everything else is a surface.
 > standard, not a platform. What it enables is *liquid media*:
 > physical-grade ownership in liquid digital form. The token is the
 > license. The bytes are just bytes. Anyone can build a storefront
-> on it, anyone can build a player, anyone can build hardware — and
-> the rights holder keeps 97.5% of every sale, so independent film can stay
-> sustainable. The 2.5% protocol fee funds shared infrastructure,
-> not marketplace rent.
+> on it, anyone can build a player, anyone can build hardware — the
+> protocol takes a flat 2.5% and the other 97.5% of the list price
+> stays on the rights-holder side, so independent film can stay
+> sustainable. The 2.5% protocol fee funds shared infrastructure, not
+> marketplace rent.
 >
 > We encrypt where it matters and trust where it matters more.
 > Lenient on downloads, strict where sovereignty is the premium.
@@ -462,7 +521,7 @@ protocol is the common layer. Everything else is a surface.
 
 ---
 
-*Last updated: 2026-07-05 (aligning to whitepaper v2.5: direct-player, compliant tier, binding model — rework in progress). Reframed §1 to clarify LMAP as the protocol
+*Last updated: 2026-07-05 (full v2.5 alignment pass applied — direct-player primary, compliant tier as day-1 launch, on-chain binding registry that informs-not-gates, threshold-released open tier, 97.5%-of-list economics, Foundation-board governance, Apache-2.0; pending external re-review). Reframed §1 to clarify LMAP as the protocol
 (like DVD) and "liquid media" as the public category term;
 restructured §7 around the two-tier attestation model (open / compliant)
 that lives at Layer 5 of the layered architecture rather than the

@@ -378,11 +378,29 @@ Polygon mainnet, immutable, and verified.
   work in entertainment law: copyright is owned, distribution rights
   are licensed. Required for full studio engagement; not blocking
   for indie launch.
+- **Binding registry** (spec'd; a launch deliverable — §4.3). A
+  separate, world-readable accounting contract holding `boundCount` per
+  `(wallet, tokenId)` and blinded binding commitments; written by the
+  attested fleet, enforcing `boundCount ≤ balance` against the token's
+  `balanceOf`; never touches token transfers. The newest and most novel
+  Layer-3 contract, and the one the compliant-tier buyer guarantee
+  reads against.
+- **Escrow / binding-aware settlement** (spec'd; a launch deliverable).
+  Settles a sale atomically against the registry's released state so a
+  buyer never pays for a still-bound unit — whether this is a V5
+  marketplace function or a standalone contract is an open interface
+  question (§12). *(The V5 reference contract's feature list predates
+  the binding model and does not yet enumerate the registry read or the
+  escrow path; both are launch-deliverable interfaces still to be
+  specified, alongside the attestation flow.)*
 - **Staking contracts** (spec'd, not deployed). For commercial
   exhibition windows where time-bounded rights are staked rather
-  than transferred.
+  than transferred (the exhibition regime — mechanism TBD with the DCI
+  community, device doc §2.1).
 - **Revocation registry** (spec'd, not deployed). For invalidating
-  attestation credentials of compromised compliant Seeds (Layer 5).
+  attestation credentials of compromised compliant Seeds (Layer 5);
+  also the recognized-roots / revocation source the binding registry
+  checks device-key writes against (§4.3).
 
 **Permissioning today (current V4.1 reality):**
 
@@ -658,7 +676,7 @@ based wallets sign on the user's behalf.
 |---|---|---|
 | 0 | Wallet only | Wallet + secure-element-attested device |
 | 1 | Standard IPFS pinning | Same, plus per-device wrapped manifest |
-| 2 | Public-data-derived keys (permeable by design) | Per-device-wrapped keys, hardware-bound (per-N security) |
+| 2 | Threshold-released keys (legacy public-data derivation retired to public-domain demo; §4.2) | Per-device-wrapped keys, hardware-bound (per-N security) |
 | 3 | Same registries | Same registries plus revocation list |
 | 4 | Any Seed can carry & serve | Any Seed can carry & serve the encrypted bytes; only an attested device can decrypt & play |
 | 5 | No attestation required | Hardware attestation required |
@@ -747,10 +765,12 @@ throughout (prefer *conformant* for the generic sense).
   hardware integrity and signs its attestation credential (a CA-like
   role; whitepaper §7.3).
 - **Key issuer (key service)** — wraps content keys to attested,
-  currently-entitled devices and maintains `boundCount` (binding
-  state). Distinct role from the credential issuer, though the
-  Foundation may operate both during bootstrap. Where older text says
-  keys are "issued by certification authorities," read *key issuer*.
+  currently-entitled devices. It does **not** maintain `boundCount`:
+  binding state lives in the on-chain binding registry, written by the
+  attested fleet under the blinded-commitment rule (§4.3). Distinct
+  role from the credential issuer, though the Foundation may operate
+  both during bootstrap. Where older text says keys are "issued by
+  certification authorities," read *key issuer*.
 - **Direct player** — a sealed compliant device with its own video
   output; the launch playback device. **Companion client** — an
   open-tier app on a third-party platform (Roku/Apple TV/iOS), for LAN
