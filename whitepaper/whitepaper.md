@@ -561,17 +561,39 @@ load-bearing security claim.
 
 Forensic watermarking binds a leak to a specific wallet, raising the
 cost of unauthorized distribution beyond the bare cryptographic
-extraction cost. In the open tier, a watermark may be inserted
-server-side by a storage service when fulfilling a download. In the
-compliant tier, watermarks are inserted Seed-side at decryption time,
-inside the secure element, before plaintext leaves the secure
-perimeter.
+extraction cost. Where it is used, the insertion locus differs by
+tier, and robustness is not yet established — so claims elsewhere in
+this paper that lean on watermark attribution ("bounded,"
+"traceable," "attributable") are **conditional** on integrating a
+scheme with independently measured robustness, not asserted as already
+delivered.
 
-Watermark robustness against transcoding and adversarial filtering
-is an ongoing research area; commercial watermarking implementations
-exist with established studio relationships. The protocol
-specifications watermark insertion points but does not mandate a
-particular scheme.
+**Compliant tier.** Watermarking inserts in the **protected media
+path** — the TEE media pipeline (§7.4), at decode time, before any
+frame reaches an output — *not* in the discrete secure element, which
+holds keys and can neither bus nor decode video. Each playback binds
+the holder's identity to the frames within the sealed perimeter.
+Transcoding-robust marking requires commercial watermarking IP (e.g.,
+Verimatrix, NAGRA, Irdeto); until such a scheme is integrated and
+independently measured, the attribution-based residual bounds of
+§7.2 remain conditional.
+
+**Open tier.** The open tier does **not** rest its defense on
+watermarking. Per-user marking collides with content addressing —
+per-wallet bytes mean per-wallet CIDs, which breaks the
+byte-identical-CID guarantee and the shared-swarm distribution model
+and reintroduces a per-download central serving path; client-side
+insertion is in any case unenforceable in a tier that welcomes
+arbitrary third-party clients. The open tier instead accepts
+playback-edge permeability by design (§7.4) and relies on social
+incentive, easy legitimate purchase, and creator alignment. A
+content-addressing-compatible open-tier mark (e.g., segment-level
+side-channel marks) is an open research item, not a v1 dependency.
+
+The protocol specifies watermark *insertion points* but mandates no
+particular scheme; commercial implementations with established studio
+relationships exist, and robustness against transcoding and
+adversarial filtering remains an ongoing research area.
 
 *Implementation status:* chunked AES-256-GCM encryption and IPFS
 storage are shipped on Polygon mainnet via the V4.1 registry.
