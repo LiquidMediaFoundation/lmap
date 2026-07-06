@@ -174,8 +174,19 @@ Rather than negotiating complex licensing agreements, distributors
 acquire sufficient tokens on the open market. Token supply is fixed
 at initial minting; if market conditions warrant increased liquidity,
 token holders may vote to approve a split, multiplying token
-quantities while preserving proportional ownership. The copyright
-holder may propose splits but cannot execute them unilaterally. New
+quantities while preserving each holder's *proportional ownership*.
+The copyright holder may propose splits but cannot execute them
+unilaterally. A split does **not** leave the rights tiers untouched,
+and this is by design: because thresholds are fixed absolute token
+counts (§4), a 2× split halves every tier's cost as a *fraction of
+supply*, uniformly — so the **ratios between tiers are preserved**
+(theatrical stays 60,000× a personal token) while access to the whole
+ladder gets cheaper together. That expanded accessibility is the point
+of a split, not a side effect. One honest consequence to name: since a
+holder may bind up to `balance` copies (§7.2), a split proportionally
+raises how many simultaneous copies each holder can run — a split is
+itself a form of authentic-supply expansion, which is precisely how
+the protocol answers scarcity-driven piracy (§14). New
 creative works — sequels, adaptations, alternative cuts — are
 tokenized as separate token IDs with independent supplies, leaving
 original token markets undisturbed.
@@ -881,10 +892,19 @@ actors, composer, screenwriter; a video game with developers,
 artists, and key team members; an album with songwriter, performers,
 and producer.
 
-Shareholders are mutable by the author, allowing collaborators to be
-added or adjusted as the work evolves. Sum of shares can be ≤ 100%
-of the author's share; any remainder flows to the author wallet,
-preserving the author as the residual recipient. For projects with
+Shareholder allocations are **append-friendly but not revocable**: the
+author can *add* collaborators, or increase a share by drawing from the
+author's own residual remainder, but **cannot reduce or zero an
+allocation already granted** to another wallet without that wallet's
+consent. This keeps the flexibility to bring collaborators on as the
+work evolves while making a granted residual a durable commitment — a
+contributor's stream, once given, cannot be unilaterally taken back.
+That is consistent with the immutability guarantee (§15) and is the
+on-chain-residuals promise a contributor can actually rely on: cast and
+crew are paid on every sale, forever, and no later edit can quietly cut
+them out. Sum of shares can be ≤ 100% of the author's share; any
+remainder flows to the author wallet, preserving the author as the
+residual recipient. For projects with
 more than 50 beneficiaries, shareholders compose with external
 splitter contracts (e.g., 0xSplits): one shareholder slot can route
 to a splitter address that distributes further.
@@ -1184,8 +1204,10 @@ The foundation, at its mature governance, will steward:
   (copyright-holder-proposed, holder-approved), which multiply token
   quantities while preserving proportional ownership. A title's
   thresholds, fees, and royalty terms are immutable for the life of
-  the token; new terms mean a new mint, not an amendment, and
-  distribution rights are never withdrawable by vote (§8).
+  the token, and a royalty share already granted to a collaborator is
+  irrevocable (§10.3 — additions are allowed, reductions are not); new
+  terms mean a new mint, not an amendment, and distribution rights are
+  never withdrawable by vote (§8).
 
 A pragmatic note about the present: the foundation does not yet
 exist as a formal legal entity. The current governance posture is

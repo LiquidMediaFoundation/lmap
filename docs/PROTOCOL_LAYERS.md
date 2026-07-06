@@ -602,13 +602,21 @@ How the protocol evolves over time. Future work.
 - **Token holder voting (per title), bounded by immutability.** The
   one per-title vote that operates on a *live* token is the **supply
   split** (§4): the copyright holder proposes, ERC-1155 holders
-  approve, token quantities multiply, and proportional ownership is
-  preserved — the mechanism that lets authentic supply expand to meet
-  demand without changing anyone's relative holding or rights. A
-  title's **thresholds, fees, and royalty terms are immutable for the
-  life of the token** (whitepaper §4, §10.1); changing them is not a
-  vote on the existing title but a **new mint** (a new version / token
-  ID, §4), leaving the original market undisturbed. **Distribution
+  approve, token quantities multiply, and each holder's proportional
+  ownership is preserved. It does **not** leave the rights tiers
+  untouched, by design: with thresholds fixed in absolute token counts,
+  a split lowers every tier's cost as a fraction of supply *uniformly*,
+  so the ratios between tiers are preserved while the whole ladder
+  becomes more accessible — the mechanism that lets authentic supply
+  expand to meet demand (whitepaper §4). Relative *ownership* is
+  preserved; tier *pricing* is intentionally lowered. A
+  title's **thresholds and fee split are immutable for the life of the
+  token**, and a royalty share already granted to a collaborator is
+  **irrevocable** (whitepaper §4, §10.1, §10.3 — additions to the
+  author's shareholder set are allowed, reductions of an existing grant
+  are not); changing the immutable terms is not a vote on the existing
+  title but a **new mint** (a new version / token ID, §4), leaving the
+  original market undisturbed. **Distribution
   rights are never withdrawable** — not by the Foundation, not by
   vote: permanence (whitepaper §8) is a hard guarantee, and a holder's
   ability to play and trade what they own cannot be revoked by any
