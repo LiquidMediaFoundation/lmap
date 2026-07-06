@@ -3,11 +3,11 @@
 > A living document on what LMAP is, what it isn't, and how it
 > relates to the clients, hardware, and marketplaces that build on it.
 >
-> **Status:** Living document — **aligned to whitepaper v2.5 (July
-> 2026); pending external re-review.** The whitepaper (v2.5),
+> **Status:** Living document — **aligned to whitepaper v2.6 (July
+> 2026); pending external re-review.** The whitepaper (v2.6),
 > `PROTOCOL_LAYERS.md`, and `DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`
 > remain canonical for engineering detail; this doc carries the
-> strategic and positioning framing. A full v2.5 alignment pass has
+> strategic and positioning framing. A full v2.6 alignment pass has
 > been applied: sealed direct-player as the primary surface, the
 > compliant tier as the day-1 (Seed-gated) launch mechanism, the
 > on-chain binding registry that *informs but never gates*, the
@@ -521,7 +521,7 @@ protocol is the common layer. Everything else is a surface.
 
 ---
 
-*Last updated: 2026-07-05 (full v2.5 alignment pass applied — direct-player primary, compliant tier as day-1 launch, on-chain binding registry that informs-not-gates, threshold-released open tier, 97.5%-of-list economics, Foundation-board governance, Apache-2.0; pending external re-review). Reframed §1 to clarify LMAP as the protocol
+*Last updated: 2026-07-05 (full v2.6 alignment pass applied — direct-player primary, compliant tier as day-1 launch, on-chain binding registry that informs-not-gates, threshold-released open tier, 97.5%-of-list economics, Foundation-board governance, Apache-2.0; pending external re-review). Reframed §1 to clarify LMAP as the protocol
 (like DVD) and "liquid media" as the public category term;
 restructured §7 around the two-tier attestation model (open / compliant)
 that lives at Layer 5 of the layered architecture rather than the

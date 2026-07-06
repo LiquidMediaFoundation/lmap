@@ -177,7 +177,7 @@ chain data can derive the wrapping key. The V4.1 deployment
 continues to serve its existing public-domain tokens under this
 construction.
 
-**Production access control (v2.5): native threshold-mediated key
+**Production access control (v2.6): native threshold-mediated key
 release.** Master keys are random (32 bytes) at content preparation;
 the encrypted master key is wrapped to a Distributed Key Generation
 public key held by a threshold network; release is gated by an Access
@@ -199,7 +199,7 @@ tier's** per-device wrapping and binding model (§4.3). ("Commercial"
 = sold for money and spans both tiers; it is not a synonym for the
 compliant tier — whitepaper §7.)
 
-For the canonical specification of both, see whitepaper v2.5 §7.
+For the canonical specification of both, see whitepaper v2.6 §7.
 
 ### 4.3 Compliant-tier key wrapping and binding (the day-1 premium mechanism)
 
@@ -782,5 +782,5 @@ throughout (prefer *conformant* for the generic sense).
 
 ---
 
-*Last updated: 2026-07-05 (aligning to whitepaper v2.5: native access layer, compliant-tier rename, direct-player, binding model — rework in progress). Living document. Expect refinement as
+*Last updated: 2026-07-05 (aligning to whitepaper v2.6: native access layer, compliant-tier rename, direct-player, binding model — rework in progress). Living document. Expect refinement as
 each layer matures from spec to implementation.*

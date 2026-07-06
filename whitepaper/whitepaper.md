@@ -6,7 +6,7 @@
 
 Harrison Kavanaugh  ·  contact\@liquidmediafoundation.org
 
-*Version 2.5 — July 2026*
+*Version 2.6 — July 2026*
 
 </div>
 
@@ -1446,6 +1446,43 @@ living public artifact.
 
 ## Changelog {-}
 
+**Version 2.6 (July 2026).** Completes the access-control rework begun
+in the v2.5 draft, following two rounds of external review. v2.5 was a
+pre-publication draft; this entry records the delta rather than
+rewriting v2.5's, keeping the correction record honest. Substantive
+changes: (1) **The compliant-tier binding model is finalized.** Binding
+state moved from an *off-chain issuer-held `bound`/`released` flag* to
+an **on-chain, world-readable binding registry present from launch**,
+tracking a **`boundCount` per `(wallet, tokenId)`** (not a per-token
+flag) written by the **attested device fleet** under a
+**blinded-commitment rule** — a bind records `hash(secret)` and never
+device identity; a release is authorized by *opening* that commitment,
+so a device can release its own sold copy with no wallet co-signature
+and no identity exposure. The **reverting-transfer-hook endgame is
+retired**: the registry *informs, it never gates*, the token transfers
+freely on-chain always, and no party — issuer included — can block
+exchange (a single party can at most *delay* a release by revoking a
+device, never withhold it). A **device self-audit** sheds sold titles
+at the device's next voluntary transaction (never during playback).
+(2) **Exhibition split into a distinct regime.** Personal copies fail
+open (sovereign); exhibition playback is *licensed, not sovereign*,
+with the enforcement mechanism deliberately left TBD to be developed
+with the DCI community — resolving the personal-bright-line-vs-§11
+collision. (3) **Privacy (§13) re-derived** from the new architecture
+(public bind/release ledger, blinded so device identity stays
+off-chain; "no link to real-world identity" softened for KYC ramps and
+chain analysis). (4) **Fee economics** stated as *97.5% of the list
+price, rights-holder-side* with the variable publisher fee set by the
+minting platform. (5) **Governance/immutability/shareholders**
+reconciled: supply-split votes only, distribution rights never
+withdrawable, granted royalty shares irrevocable (additions allowed),
+splits honestly re-price rights tiers while preserving proportional
+ownership. (6) **README and companion documents aligned**;
+version/status/legal-structure/watermark-locus/carriage corrected
+throughout. Wire-level attestation, the binding registry and
+binding-aware escrow, and the exhibition mechanism are named as launch
+deliverables in active specification, not asserted as built.
+
 **Version 2.5 (July 2026).** Forward-ports the access-control
 refinements settled after v2.4. (1) **The access layer is native.**
 The threshold-release primitive is stated as substrate-independent
@@ -1456,25 +1493,16 @@ Foundation's federated framework; an external network may serve only
 as a swappable interim bridge behind a stable interface. (2) **The
 "certified tier" is renamed the "compliant tier"** throughout, naming
 the tier by the open conformance standard a device meets rather than
-by an authority's grant. (3) **A binding model is added to the
-compliant tier (§7.2).** Per-device wrapping now tracks binding as a
-`boundCount` per `(wallet, tokenId)`, recorded in an **on-chain,
-world-readable binding registry from launch** — a separate accounting
-contract written by the attested compliant-player fleet (only a
-compliant device, authorized by the owner's wallet, can set the flag;
-no central issuer writes it; the token stays a plain ERC-1155): a copy
-binds to one secure element at a time, plays offline indefinitely, and
-is *released* — the device deletes its wrapped key — before a unit
-trades without residual. The registry *informs* rather than *gates*:
-the token transfers freely on-chain at all times, the protocol lets no
-party block exchange, and scarcity for safe trade comes from platforms
-honoring the flag plus opt-in escrow that settles atomically against
-it. An owner-signed
-report releases a lost device's titles after a 30-day window (no
-presence beacon), with transaction-gated erasure. This restores
-one-copy-per-token scarcity for honest trade, and with it collectible
-and resale value, without any continuous ownership check — resolving
-the sovereignty-versus-scarcity tension in favor of both. Companion
+by an authority's grant. (3) **A binding model is introduced for the
+compliant tier (§7.2)** — per-device wrapping tracks a `boundCount` per
+`(wallet, tokenId)` so a copy binds to one secure element at a time,
+plays offline indefinitely, and is *released* before a unit trades
+without residual, restoring one-copy-per-token scarcity without any
+continuous ownership check. *(The v2.5 draft carried an earlier form of
+this model, including an on-chain `bound`/`released` status; the
+mechanism — a fleet-written blinded-commitment registry that informs
+but never gates, with the transfer-hook endgame retired — was finalized
+in v2.6, above.)* Companion
 documents (`PROTOCOL_LAYERS.md`, `PROTOCOL_POSITIONING.md`) are being
 brought into alignment (a multi-pass rework in progress).
 
@@ -1555,7 +1583,7 @@ no dependency on any centralized service. The daemon's operating
 behavior — IPFS fetch with local Kubo preference, automatic
 content pinning to make the Seed a provider, LAN-streaming via
 HTTP/mDNS with byte-range support — is documented as the
-canonical reference behavior for conformant Seeds. §7.2 (Compliant
+canonical reference behavior for compliant Seeds. §7.2 (Compliant
 Tier) gains a normative statement: hardware binding (SE-resident
 keypair generation, non-extractable private keys, in-SE key
 unwrapping, in-SE attestation signing) is a MUST for V6

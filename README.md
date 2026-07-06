@@ -49,7 +49,7 @@ model and per-component status.
 | Copyright registry `LMAPCopyrightRegistryV1` | Specified — future protocol version (V6), not paired with V5 |
 | Legacy `WyllohRegistryProtocolV4_1` (open-tier compatible) | Shipped, immutable, on Polygon mainnet |
 | Node.js reference client (Seed daemon) | Operational in the Wylloh reference implementation; extraction to this repo planned |
-| Whitepaper | **v2.5** (July 2026) — [read the PDF](./whitepaper/whitepaper.pdf) or [Markdown source](./whitepaper/whitepaper.md) |
+| Whitepaper | **v2.6** (July 2026) — [read the PDF](./whitepaper/whitepaper.pdf) or [Markdown source](./whitepaper/whitepaper.md) |
 
 ---
 

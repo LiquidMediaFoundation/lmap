@@ -25,7 +25,7 @@ CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
   --standalone \
   --css="$CSS" \
   --embed-resources \
-  --metadata title="LMAP — Whitepaper v2.5" \
+  --metadata title="LMAP — Whitepaper v2.6" \
   -o "$HTML"
 
 "$CHROME" \
