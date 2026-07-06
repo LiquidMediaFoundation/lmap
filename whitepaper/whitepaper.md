@@ -1086,8 +1086,12 @@ The foundation, at its mature governance, will steward:
   the compliant tier (§7.3).
 - **Treasury.** Custody of the protocol fee revenue, application to
   shared infrastructure costs, and grants to ecosystem development.
-- **Token-holder governance.** Per-title decisions (royalty splits,
-  rights-tier amendments, supply changes) where applicable.
+- **Token-holder governance.** Supply-split proposals
+  (copyright-holder-proposed, holder-approved), which multiply token
+  quantities while preserving proportional ownership. A title's
+  thresholds, fees, and royalty terms are immutable for the life of
+  the token; new terms mean a new mint, not an amendment, and
+  distribution rights are never withdrawable by vote (§8).
 
 A pragmatic note about the present: the foundation does not yet
 exist as a formal legal entity. The current governance posture is

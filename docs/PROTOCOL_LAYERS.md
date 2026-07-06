@@ -566,11 +566,21 @@ How the protocol evolves over time. Future work.
   include Swiss Stiftung and US 501(c)(3)).
 - **Federated certification.** Layer 5 attestation authorities
   beyond the Foundation, federated under a public governance process.
-- **Token holder voting (per title).** ERC-1155 holders of a given
-  film vote on per-title decisions: royalty split adjustments,
-  rights tier amendments, withdrawal of distribution rights. Only
-  applies to per-title decisions; protocol-level governance lives
-  in the Foundation.
+- **Token holder voting (per title), bounded by immutability.** The
+  one per-title vote that operates on a *live* token is the **supply
+  split** (§4): the copyright holder proposes, ERC-1155 holders
+  approve, token quantities multiply, and proportional ownership is
+  preserved — the mechanism that lets authentic supply expand to meet
+  demand without changing anyone's relative holding or rights. A
+  title's **thresholds, fees, and royalty terms are immutable for the
+  life of the token** (whitepaper §4, §10.1); changing them is not a
+  vote on the existing title but a **new mint** (a new version / token
+  ID, §4), leaving the original market undisturbed. **Distribution
+  rights are never withdrawable** — not by the Foundation, not by
+  vote: permanence (whitepaper §8) is a hard guarantee, and a holder's
+  ability to play and trade what they own cannot be revoked by any
+  governance process. Protocol-level governance lives in the
+  Foundation.
 - **Multisig stewardship of upgradeable components.** During the
   bootstrap phase, upgradeable contracts are governed by a multisig
   of identifiable stewards. Public sunset milestones commit the
