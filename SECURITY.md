@@ -51,21 +51,27 @@ report those to the implementing party directly.
 
 The LMAP threat model is documented in `docs/PROTOCOL_LAYERS.md`,
 particularly §4 (Cryptography) and §7 (Attestation), and in the
-whitepaper v2.4 §7. The protocol's open-tier production access
-control is **threshold-mediated key release via Lit Protocol's
-Naga mainnet** — decryption material is released only to wallets
-that currently satisfy the on-chain ownership check. The earlier
-v2.3 framing — that "open-tier permeability is intentional" via
-the deterministic key-derivation construction — is retired as a
-production posture under v2.4; that construction now survives only
-for the V4.1 deployment of public-domain content. Reports
-identifying vulnerabilities in the threshold-mediated production
-path (Lit ACC evaluation correctness, transfer semantics,
-permanence guarantees) are in scope and welcomed. The certified
-tier (hardware-attested per-device key wrapping) addresses a
-distinct threat model — *endpoint protection during playback*
-against the legitimate viewer's own device — which threshold
-release does not address; reports there are also in scope.
+whitepaper v2.6 §7. Production access control on the forthcoming
+V5 deployment is **native to the protocol** — decryption is gated
+by current on-chain ownership, with no external key-management
+service. The certified (compliant) tier binds each copy to an
+attested, secure-element-backed player and wraps content keys to
+that device; at bootstrap a single Foundation-operated key issuer
+performs this wrapping and decentralizes to a threshold network
+across the Seed fleet. See
+[`docs/DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`](docs/DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md)
+for the full model. The earlier v2.3 framing — that "open-tier
+permeability is intentional" via the deterministic key-derivation
+construction — is retired as a production posture; that
+construction now survives only for the V4.1 deployment of
+public-domain content (*The Cocoanuts*). Reports identifying
+vulnerabilities in the native production path (on-chain ownership
+gating, key-issuance and wrapping correctness, binding-registry
+accounting, transfer semantics, permanence guarantees) are in
+scope and welcomed. The certified tier additionally addresses
+*endpoint protection during playback* against the legitimate
+viewer's own device — a distinct threat model that access control
+alone does not address; reports there are also in scope.
 
 ## Smart contract scope
 

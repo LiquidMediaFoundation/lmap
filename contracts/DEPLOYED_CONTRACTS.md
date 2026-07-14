@@ -23,13 +23,18 @@ V4.1 deployment under LMAP 1.0. The cryptographic construction used
 by V4.1 — deterministic wrapping-key derivation from public on-chain
 data — is appropriate for the public-domain demonstration content
 deployed on V4.1 (*The Cocoanuts*) but is retired as a production
-model under whitepaper v2.4 §7. Production access control on the
-forthcoming V5 deployment uses threshold-mediated key release via
-Lit Protocol's Naga mainnet, with the certified tier providing
-optional hardware-attested per-device key wrapping for content
-where licensing contracts demand endpoint protection. Existing
-tokens minted on V4.1 remain fully functional and continue to
-operate under the legacy construction.
+model under whitepaper v2.6 §7. Production access control on the
+forthcoming V5 deployment is **native to the protocol** — decryption
+is gated by current on-chain ownership with no external
+key-management service. The certified (compliant) tier binds each
+copy to an attested, secure-element-backed player and wraps content
+keys to that device; at bootstrap a single Foundation-operated key
+issuer performs this wrapping and decentralizes to a threshold
+network across the Seed fleet, with no single trusted party at the
+destination. See
+[`docs/DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`](../docs/DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md)
+for the full model. Existing tokens minted on V4.1 remain fully
+functional and continue to operate under the legacy construction.
 
 The Solidity source is preserved verbatim at
 [`contracts/legacy/WyllohRegistryProtocolV4_1.sol`](contracts/legacy/WyllohRegistryProtocolV4_1.sol)

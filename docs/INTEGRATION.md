@@ -106,24 +106,26 @@ The flow:
 
 The deterministic key-derivation construction described above is the
 **legacy V4.1 mechanism**, retired as a production model under
-whitepaper v2.4. It survives only for the V4.1 deployment of
+whitepaper v2.6. It survives only for the V4.1 deployment of
 public-domain content (notably *The Cocoanuts*). New commercial
-content uses **threshold-mediated key release via Lit Protocol's
-Naga mainnet** as the production access-control mechanism:
-encrypted master keys are wrapped to a Distributed Key Generation
-public key held by Lit's threshold network; release is gated by an
-Access Control Condition evaluated against current on-chain
-`balanceOf` at decryption time. Transfers cause access to flow to
-the new holder automatically. See whitepaper v2.4 §7 and
-[`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §4.2 for the canonical
-specification.
+content uses **native, protocol-level access control**: decryption
+is gated by current on-chain ownership, with no external
+key-management service. For the certified (compliant) tier, each
+copy is bound to an attested, secure-element-backed player and
+content keys are wrapped to that device; at bootstrap a single
+Foundation-operated key issuer performs the wrapping (only on a
+confirmed binding-registry write) and decentralizes to a threshold
+network across the Seed fleet. Transfers flow access to the new
+holder through the on-chain ownership check. See whitepaper v2.6 §7,
+[`DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md`](./DEVICE_COMPLIANCE_AND_ACCESS_CONTROL.md),
+and [`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §4.2 for the
+canonical specification.
 
-For studio-grade content, the certified attestation tier (Layer 5,
-spec'd, not yet shipped) provides hardware-attested per-device key
-wrapping on top of threshold release — the certified tier is what
-provides *endpoint protection during playback*, addressing the
-threat model that threshold release does not. Implementation details
-in [`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §7.
+The certified tier is also what provides *endpoint protection
+during playback* — binding to a compliant device addresses the
+threat model (the legitimate viewer's own device) that
+ownership-gating alone does not. Implementation details in
+[`PROTOCOL_LAYERS.md`](./PROTOCOL_LAYERS.md) §7.
 
 ---
 
