@@ -62,7 +62,6 @@ lmap/
 │   ├── PROTOCOL_POSITIONING.md        Strategic posture; what's open
 │   ├── INTEGRATION.md                 Developer guide
 │   ├── CoreValues.md                  The four problems LMAP exists to address
-│   ├── TOKEN_UTILITY_SECURITIES_COMPLIANCE.md
 │   └── adr/                           Architecture decision records
 ├── contracts/                         Reference contracts and tests
 │   ├── contracts/                     V5 reference (in development)
